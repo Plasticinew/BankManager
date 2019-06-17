@@ -49,3 +49,8 @@
     delBank(name)
 
     ```
+
+### 已知问题
+* mysql-connector:No localization support for language 'eng'
+    
+    会报错但不影响程序正确执行

@@ -16,7 +16,7 @@ class BankClass(Base):
 
 
 class Bank:
-    "支行管理的接口类，提供了三种排序方式的"
+    "支行管理的接口类，提供了三种排序方式的获取和筛选接口，以及增改删接口"
     def __init__(self):
         engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
         DBSession = sessionmaker(bind=engine)
