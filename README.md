@@ -53,7 +53,8 @@
     ```python
     from query import Bank
     #bank类的接口示例
-    bank = Bank()
+    #生成bank对象时输入要访问数据库的用户名密码
+    bank = Bank('test','2161815')
     #添加支行信息
     bank.newBank('下北泽支行', '下北泽', 43962800)
     bank.newBank('合肥支行', '合肥', 1919810)

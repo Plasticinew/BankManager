@@ -17,8 +17,8 @@ class BankClass(Base):
 
 class Bank:
     "支行管理的接口类，提供了三种排序方式的获取和筛选接口，以及增改删接口"
-    def __init__(self):
-        engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
+    def __init__(self,name,key):
+        engine = db.create_engine('mysql+mysqlconnector://root:'+key+'@localhost:3306/'+name)
         DBSession = sessionmaker(bind=engine)
         self.session = DBSession()
 
@@ -83,7 +83,7 @@ class Bank:
 
 if __name__ == '__main__':
     #bank类的接口示例
-    bank = Bank()
+    bank = Bank('2161815')
     #添加支行信息
     bank.newBank('下北泽支行', '下北泽', 43962800)
     bank.newBank('合肥支行', '合肥', 1919810)
