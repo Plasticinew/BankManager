@@ -83,7 +83,7 @@ class Bank:
 
 if __name__ == '__main__':
     #bank类的接口示例
-    bank = Bank('2161815')
+    bank = Bank('test','2161815')
     #添加支行信息
     bank.newBank('下北泽支行', '下北泽', 43962800)
     bank.newBank('合肥支行', '合肥', 1919810)
