@@ -15,6 +15,18 @@ class BankClass(Base):
     #Workers = db.orm.relationship('银行员工')
 
 
+class StaffClass(Base):
+    __tablename__ = 'Staff'
+
+    StaffID = db.Column(db.CHAR(18), primary_key=True, nullable=False)
+    BankName = db.Column(db.CHAR(255), db.ForeignKey('Bank.BankName'),nullable=False)
+    StaffName = db.Column(db.CHAR(18), nullable=False)
+    Phone = db.Column(db.CHAR(14), nullable=False)
+    Address = db.Column(db.CHAR(255), nullable=False)
+    DateStartWorking = db.Column(db.DATE, nullable=False)
+    bankname = db.orm.relationship('BankClass',backref='StaffofBank')
+
+
 class Bank:
     "支行管理的接口类，提供了三种排序方式的获取和筛选接口，以及增改删接口"
     def __init__(self,name,key):
@@ -74,7 +86,8 @@ class Bank:
 
     #待完成：考虑约束的删除
     def delBank(self, name):
-        self.session.delete(self.session.query(BankClass).filter(BankClass.BankName == name).first())
+        if(len(self.session.query(BankClass).filter(BankClass.BankName == name).first().StaffofBank) == 0):
+            self.session.delete(self.session.query(BankClass).filter(BankClass.BankName == name).first())
         self.session.commit()
 
     def __del__(self):
