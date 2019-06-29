@@ -45,31 +45,54 @@ class Bank:
             bank = BankClass(BankName=name, City=city, Property=property)
             self.session.add(bank)
         else:
-            print("Bank Name Exists!")
-        self.session.commit()
+            raise Exception("Bank Name Exists!")
 
     def setBank(self, name, new, attribute):
         bank = self.session.query(BankClass).filter(BankClass.BankName == name).first()
-        if(len(self.session.query(BankClass).filter(BankClass.__getattribute__(BankClass, attribute) == new).all()) == 0):
-            bank.__setattr__(attribute, new)
+        if(attribute == 'BankName'):
+            if(len(self.session.query(BankClass).filter(BankClass.__getattribute__(BankClass, attribute) == new).all()) == 0):
+                bank.__setattr__(attribute, new)
+            else:
+                raise Exception("Bank Name Exists!")
         else:
-            print("Bank Name Exists!")
-        self.session.commit()
+            bank.__setattr__(attribute, new)
 
     #待完成：考虑约束的删除
     def delBank(self, name):
         if(len(self.session.query(BankClass).filter(BankClass.BankName == name).first().StaffofBank) == 0):
             self.session.delete(self.session.query(BankClass).filter(BankClass.BankName == name).first())
-        self.session.commit()
+        else:
+            raise Exception("ForeignKey constraint.")
 
-'''
+
 class Staff:
     def __init__(self, session):
         self.session = session
 
-    def getStaffbyID(self, id = '', ):
+    '''
+    date yyyy-mm-dd
+    '''
+    def getStaff(self, id='', bank='', name='', phone='', address='',startdate='', enddate='' ,smallfirst=True, orderby='StaffID'):
+        staffList=[]
+        for staff in self.session.query(StaffClass) \
+                .filter(StaffClass.StaffID.like('%'+id+'%'),
+                        StaffClass.BankName.like('%'+bank+'%'),
+                        StaffClass.StaffName.like('%'+name+'%'),
+                        StaffClass.Phone.like('%'+phone+'%'),
+                        StaffClass.Address.like('%'+address+'%'),
+                        StaffClass.DateStartWorking > startdate,
+                        StaffClass.DateStartWorking < enddate)\
+                .order_by((1 if smallfirst else -1)*StaffClass.__getattribute__(StaffClass, orderby)):
+            staffList.append([staff.StaffID, staff.BankName, staff.StaffName, staff.Phone, staff.Address, staff.DateStartWorking])
+        return staffList
         
-'''
+    def setStaff(self, attribute, id, new):
+        bank = self.session.query(BankClass).filter(BankClass.BankName == name).first()
+        if (len(self.session.query(BankClass).filter(
+                BankClass.__getattribute__(BankClass, attribute) == new).all()) == 0):
+            bank.__setattr__(attribute, new)
+        else:
+            raise Exception("Bank Name Exists!")
 
 
 
