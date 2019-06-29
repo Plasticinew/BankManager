@@ -15,41 +15,43 @@ engine = create_engine( \
     'mysql+mysqlconnector://root:mayuxin1999@localhost:3306/bankdbms')
 DBSession = sessionmaker(bind=engine)
 
+
+
 Base = declarative_base()
+
 
 class BankClass(Base):
     __tablename__ = 'Bank'
 
     BankName = Column(CHAR(255), primary_key=True, nullable=False)
     City = Column(CHAR(255), nullable=False)
-    Property = Column(INT, nullable=False)
+    Property = Column(FLOAT, nullable=False)
 
-    # Workers = db.orm.relationship('银行员工')
-
-    def __repr__(self):
-        return "<Bank(BankName = '%s', City = '%s', Property = '%d')" \
-               % (self.BankName, self.City, self.Property)
 
 class StaffClass(Base):
     __tablename__ = 'Staff'
 
     StaffID = Column(CHAR(18), primary_key=True, nullable=False)
-    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'),nullable=False)
+    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'))
     StaffName = Column(CHAR(18), nullable=False)
     Phone = Column(CHAR(14), nullable=False)
     Address = Column(CHAR(255), nullable=False)
     DateStartWorking = Column(DATE, nullable=False)
-    bankname = relationship('BankClass',backref='StaffofBank')
+    bankname = relationship('BankClass', backref='StaffofBank')
+
 
 class ClientClass(Base):
     __tablename__ = 'Client'
 
     ClientID = Column(CHAR(18), primary_key=True, nullable=False)
-    LinkID = Column(CHAR(18))
-    LinkName = Column(CHAR(16))
+    LinkID = Column(CHAR(18), ForeignKey('LinkMan.ClientID'))
+    LinkName = Column(CHAR(16), ForeignKey('LinkMan.LinkName'))
     ClientName = Column(CHAR(18), nullable=False)
     Phone = Column(CHAR(14), nullable=False)
     Address = Column(CHAR(255), nullable=False)
+    linkid = relationship('LinkManClass', backref='ClientIDofLink', foreign_keys=[LinkID])
+    linkname = relationship('LinkManClass', backref='ClientNameofLink', foreign_keys=[LinkName])
+
 
 class AccountClass(Base):
     __tablename__ = 'Account'
@@ -58,11 +60,94 @@ class AccountClass(Base):
     Balance = Column(FLOAT, nullable=True)
     DateOpening = Column(DATE, nullable=True)
 
+
+class CheckAccountClass(Base):
+    __tablename__ = 'CheckAccount'
+
+    AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
+    BankName = Column(CHAR(255), ForeignKey('OpenAccount.BankName'))
+    ClientID = Column(CHAR(18), ForeignKey('OpenAccount.ClientID'))
+    Balance = Column(FLOAT, nullable=True)
+    DateOpening = Column(DATE, nullable=True)
+    Overdraft = Column(FLOAT)
+    accountid = relationship('AccountClass', backref='CheckofAccount', foreign_keys=[AccountID])
+    bankname = relationship('OpenAccountClass', backref='CheckBankofOpen', foreign_keys=[BankName])
+    clientid = relationship('OpenAccountClass', backref='CheckIDofOpen', foreign_keys=[ClientID])
+
+
+class SaveAccountClass(Base):
+    __tablename__ = 'SaveAccount'
+
+    AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
+    BankName = Column(CHAR(255), ForeignKey('OpenAccount.BankName'))
+    ClientID = Column(CHAR(18), ForeignKey('OpenAccount.ClientID'))
+    Balance = Column(FLOAT, nullable=True)
+    DateOpening = Column(DATE, nullable=True)
+    Rate = Column(FLOAT)
+    accountid = relationship('AccountClass', backref='SaveofAccount', foreign_keys=[AccountID])
+    bankname = relationship('OpenAccountClass', backref='SaveBankofOpen', foreign_keys=[BankName])
+    clientid = relationship('OpenAccountClass', backref='SaveIDofOpen', foreign_keys=[ClientID])
+
+
+class OwningClass(Base):
+    __tablename__ = 'Owning'
+
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True)
+    LoanID = Column(CHAR(18), ForeignKey('Loan.LoanID'), primary_key=True)
+    clientid = relationship('ClientClass', backref='OwnofClinet', foreign_keys=[ClientID])
+    loanid = relationship('LoanClass', backref='OwnofLoan', foreign_keys=[LoanID])
+
+
+class LinkManClass(Base):
+    __tablename__ = 'LinkMan'
+
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True, nullable=True)
+    LinkName = Column(CHAR(16), primary_key=True, nullable=True)
+    Phone = Column(CHAR(14))
+    Email = Column(CHAR(14))
+    Association = Column(CHAR(128))
+    clientid = relationship('ClientClass', backref='LinkofClient', foreign_keys=[ClientID])
+
+
+class LoanClass(Base):
+    __tablename__ = 'Loan'
+
+    LoanID = Column(CHAR(18), primary_key=True)
+    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'))
+    Amount = Column(FLOAT, nullable=True)
+    clientid = relationship('BankClass', backref='LoanofBank')
+
+
+class PayLoanClass(Base):
+    __tablename__ = 'PayLoan'
+
+    PayID = Column(CHAR(18), primary_key=True)
+    LoanID = Column(CHAR(18), ForeignKey('Loan.LoanID'), primary_key=True)
+    Date = Column(DATE)
+    Amount = Column(CHAR(FLOAT))
+    loanid = relationship('LoanClass', backref='PayofLoan')
+
+
+class OpenAccountClass(Base):
+    __tablename__ = 'OpenAccount'
+
+    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'), primary_key=True)
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True)
+    CheckAccountID = Column(CHAR(11), ForeignKey('CheckAccount.AccountID'))
+    SaveAccountID = Column(CHAR(11), ForeignKey('SaveAccount.AccountID'))
+    bankname = relationship('BankClass', backref='AccountofBank', foreign_keys=[BankName])
+    clientid = relationship('ClientClass', backref='AccountofCilent', foreign_keys=[ClientID])
+    checkaccountid = relationship('CheckAccountClass', backref='OpenofCheck', foreign_keys=[CheckAccountID])
+    saveaccountid = relationship('SaveAccountClass', backref='OpenofSave', foreign_keys=[SaveAccountID])
+
+
 class PersonInChargeClass(Base):
     __tablename__ = 'PersonInCharge'
 
-    ClientID = Column(CHAR(18), ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True, nullable=False)
     StaffID = Column(CHAR(18), ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+    clientid = relationship('ClientClass', backref='ChargeofClient', foreign_keys=[ClientID])
+    staffid = relationship('StaffClass', backref='ChargeofStaff', foreign_keys=[StaffID])
 
 
 
