@@ -2,9 +2,9 @@ import sqlalchemy as db
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from db import BankClass, StaffClass, \
-ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
-SaveAccountClass, CheckAccountClass
+from BankManager.db import BankClass, StaffClass
+# ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
+# SaveAccountClass, CheckAccountClass
 
 
 
@@ -12,7 +12,8 @@ def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, s
     bankList=[]
     for bank in session.query(BankClass) \
             .filter(BankClass.BankName.like('%'+name+'%'), BankClass.City.like('%'+city+'%'), BankClass.Property > propertylow, BankClass.Property < propertyhigh)\
-            .order_by((1 if smallfirst else -1)*BankClass.__getattribute__(BankClass, orderby)):
+            .order_by(BankClass.__getattribute__(BankClass, orderby)):
+        # .order_by((1 if smallfirst else -1)*BankClass.__getattribute__(BankClass, orderby)):
         bankList.append([bank.BankName, bank.City, bank.Property])
     return bankList
 
@@ -59,7 +60,8 @@ def getStaff(session, id='', bank='', name='', phone='', address='',startdate='0
                     StaffClass.Address.like('%'+address+'%'),
                     StaffClass.DateStartWorking > startdate,
                     StaffClass.DateStartWorking < enddate)\
-            .order_by((1 if smallfirst else -1)*StaffClass.__getattribute__(StaffClass, orderby)):
+            .order_by(StaffClass.__getattribute__(StaffClass, orderby)):
+            #.order_by((1 if smallfirst else -1)*StaffClass.__getattribute__(StaffClass, orderby)):
         staffList.append([staff.StaffID, staff.BankName, staff.StaffName, staff.Phone, staff.Address, staff.DateStartWorking])
     return staffList
 
