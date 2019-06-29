@@ -1,219 +1,133 @@
-﻿<!doctype html>
-<html class="no-js">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>table manage system</title>
-    <meta name="description" content="to manage bank">
-    <meta name="keywords" content="table">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="renderer" content="webkit">
-    <meta http-equiv="Cache-Control" content="no-siteapp"/>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/i/favicon.png') }}">
-    <link rel="apple-touch-icon-precomposed" href="{{ url_for('static', filename='assets/i/app-icon72x72@2x.png') }}">
-    <meta name="apple-mobile-web-app-title" content="Amaze UI"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/amazeui.min.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/admin.css') }}">
-</head>
-<body>
-<!--[if lte IE 9]>
-<p class="browsehappy">你正在使用<strong>过时</strong>的浏览器，暂不支持。 请升级浏览器以获得更好的体验！</p>
-<![endif]-->
+﻿{% extends "template.html" %}
+{% block title %}<strong class="am-text-primary am-text-lg">支行管理</strong> /
+<small>Bank</small>{% endblock %}
 
-<header class="am-topbar am-topbar-inverse admin-header">
-    <div class="am-topbar-brand">
-        <small>银行后台管理系统</small>
-    </div>
-
-
-    <div class="am-collapse am-topbar-collapse" id="topbar-collapse">
-
-        <ul class="am-nav am-nav-pills am-topbar-nav am-topbar-right admin-header-list">
-            <li class="am-dropdown" data-am-dropdown>
-                <a class="am-dropdown-toggle" data-am-dropdown-toggle href="javascript:;">
-                    <span class="am-icon-users"></span> 管理员 <span class="am-icon-caret-down"></span>
+{% block body %}
+<div class="am-g">
+    <div class="am-u-sm-12 am-u-md-4">
+        <div class="am-btn-toolbar">
+            <div class="am-btn-group am-btn-group-xs">
+                <a href="{{url_for('bank.addbank')}}">
+                    <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
+                        新增
+                    </button>
                 </a>
-                <ul class="am-dropdown-content">
-                    <li><a href="#"><span class="am-icon-user"></span> 资料</a></li>
-                    <li><a href="#"><span class="am-icon-cog"></span> 设置</a></li>
-                    <li><a href="#"><span class="am-icon-power-off"></span> 退出</a></li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-</header>
-
-<div class="am-cf admin-main">
-    <!-- sidebar start -->
-    <div class="admin-sidebar am-offcanvas" id="admin-offcanvas">
-        <div class="am-offcanvas-bar admin-offcanvas-bar">
-            <ul class="am-list admin-sidebar-list">
-                <li><a href="{{url_for('bank.index')}}"><span class="am-icon-home"></span> 首页</a></li>
-                <li><a href="{{url_for('bank.bank',page = 0)}}"><span class="am-icon-table"></span> 支行管理</a></li>
-                <li><a href="{{url_for('bank.addbank')}}"><span class="am-icon-pencil-square-o"></span> 账户管理</a></li>
-                <li><a href="{{url_for('bank.login')}}"><span class="am-icon-sign-out"></span> 注销</a></li>
-            </ul>
-
-
+                <a href="#">
+                    <button type="button" class="am-btn am-btn-default"><span class="am-icon-save"></span>
+                        保存
+                    </button>
+                </a>
+            </div>
         </div>
     </div>
-    <!-- sidebar end -->
+    <div class="am-u-sm-12 am-u-md-8">
+        <form method="post">
+            <label for="name">名称</label>
+            <input name="name" id="name" size="6">
+            <label for="city">城市</label>
+            <input name="city" id="city" size="6">
+            <label for="minp">资产范围</label>
+            <input name="minp" id="minp" size="4">
+            <label for="maxp">-</label>
+            <input name="maxp" id="maxp" size="4">
+            <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
+                <option value="option0">--排序方式--</option>
+                <option value="option1">余额</option>
+                <option value="option2">名称</option>
+                <option value="option3">城市</option>
+            </select>
+            <input type="submit" value="查询">
+        </form>
+    </div>
+</div>
+<div class="am-g">
+    <div class="am-u-sm-12">
+        <form class="am-form">
+            <table class="am-table am-table-striped am-table-hover table-main">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="table-id">序号</th>
+                    <th class="table-title" width="40%">名称</th>
+                    <th class="table-type">城市</th>
+                    <th class="table-author">资产</th>
+                    <th class="table-set">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for dbank in cont[page*10:page*10+10] %}
+                <tr>
+                    <td></td>
+                    <td>{{loop.index+page*10}}</td>
+                    <td>{{dbank[0]}}</td>
+                    <td>{{dbank[1]}}</td>
+                    <td class="am-hide-sm-only">{{dbank[2]}}</td>
+                    <td>
+                        <div class="am-btn-toolbar">
+                            <div class="am-btn-group am-btn-group-xs">
+                                <a href="{{url_for('bank.editbank',pk = dbank[0])}}"
+                                   class="am-btn am-btn-xs am-text-secondary"><span
+                                        class="am-icon-pencil-square-o"></span> 编辑
 
-    <!-- content start -->
-    <div class="admin-content">
-        <div class="admin-content-body">
-            <div class="am-cf am-padding am-padding-bottom-0">
-                <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">支行管理</strong> /
-                    <small>Bank</small>
-                </div>
-            </div>
+                                </a>
+                                <a href="{{url_for('bank.delbank',pk = dbank[0])}}"
+                                   class="am-btn am-btn-xs am-text-danger">
+                                    <span class="am-icon-trash-o"></span> 删除
 
-            <hr>
+                                </a>
 
-            <div class="am-g">
-                <div class="am-u-sm-12 am-u-md-6">
-                    <div class="am-btn-toolbar">
-                        <div class="am-btn-group am-btn-group-xs">
-                            <a href="{{url_for('bank.addbank')}}">
-                                <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
-                                    新增
-                                </button>
-                            </a>
-                            <a href="#">
-                                <button type="button" class="am-btn am-btn-default"><span class="am-icon-save"></span>
-                                    保存
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="am-u-sm-12 am-u-md-6">
-                    <form method="post">
-                        <label for="name">名称</label>
-                        <input name="name" id="name" size="6">
-                        <label for="city">城市</label>
-                        <input name="city" id="city" size="6">
-                        <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
-                            <option value="option0">--排序方式--</option>
-                            <option value="option1">余额</option>
-                            <option value="option2">名称</option>
-                            <option value="option3">城市</option>
-                        </select>
-                        <input type="submit" value="查询">
-                    </form>
-                </div>
-            </div>
-            <div class="am-g">
-                <div class="am-u-sm-12">
-                    <form class="am-form">
-                        <table class="am-table am-table-striped am-table-hover table-main">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th class="table-id">序号</th>
-                                <th class="table-title" width="40%">名称</th>
-                                <th class="table-type">城市</th>
-                                <th class="table-author">资产</th>
-                                <th class="table-set">操作</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for dbank in cont[page*10:page*10+10] %}
-                            <tr>
-                                <td></td>
-                                <td>{{loop.index+page*10}}</td>
-                                <td>{{dbank[0]}}</td>
-                                <td>{{dbank[1]}}</td>
-                                <td class="am-hide-sm-only">{{dbank[2]}}</td>
-                                <td>
-                                    <div class="am-btn-toolbar">
-                                        <div class="am-btn-group am-btn-group-xs">
-                                            <a href="{{url_for('bank.editbank',pk = dbank[0])}}" class="am-btn am-btn-xs am-text-secondary"><span
-                                                        class="am-icon-pencil-square-o"></span> 编辑
-
-                                            </a>
-                                            <a href="{{url_for('bank.delbank',pk = dbank[0])}}" class="am-btn am-btn-xs am-text-danger">
-                                                    <span class="am-icon-trash-o"></span> 删除
-
-                                            </a>
-
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <div class="am-cf">
-                            共{{tot}}条记录，当前显示{{page*10+1}}到{% if page*10+10>tot %}{{tot}}{%else%}{{page*10+10}}{%endif%}条
-                            <div class="am-fr">
-                                <ul class="am-pagination">
-                                    <li {% if page==0 %} class="am-disabled" {% endif %}><a
-                                            href="{{url_for('bank.bank',page = page-1)}}">«</a></li>
-
-                                    {%if page<=2%}
-                                        {%set min=0%}
-                                    {%else%}
-
-                                        {%set min=page-2%}
-                                    <li><a href="#">...</a></li>
-                                    {%endif%}
-
-                                    {%if tot//10+1<min+5 %}
-                                        {%set max=tot//10+1%}
-                                    {%else%}
-                                        {%set max=min+5%}
-                                    {%endif%}
-
-                                    {% for place in range(min,max) %}
-                                    <li {% if page==place %} class="am-active" {% endif %}><a href="{{url_for('bank.bank',page = place)}}">{{place+1}}</a>
-                                    </li>
-                                    {% endfor %}
-                                    {%if tot//10+1>min+5 %}
-                                    <li><a href="#">...</a></li>
-                                    {%endif%}
-
-
-                                    <li {% if page*10+10>tot %} class="am-disabled" {% endif %}><a
-                                            href="{{url_for('bank.bank',page = page+1)}}">»</a></li>
-                                </ul>
                             </div>
                         </div>
-                        <hr/>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="am-cf">
+                共{{tot}}条记录，当前显示{{page*10+1}}到{% if page*10+10>tot %}{{tot}}{%else%}{{page*10+10}}{%endif%}条
+                <div class="am-fr">
+                    <ul class="am-pagination">
+                        <li {% if page==0 %} class="am-disabled" {% endif %}><a
+                                href="{{url_for('bank.bank',page = page-1,refresh=0)}}">«</a></li>
 
-                    </form>
+                        {%if page<=2%}
+                        {%set min=0%}
+                        {%else%}
+
+                        {%set min=page-2%}
+                        <li><a href="#">...</a></li>
+                        {%endif%}
+
+                        {%if tot//10+1
+                        <min
+                                +5 %}
+                                {%set max=tot//10+1%}
+                                {%else%}
+                                {%set max=min+5%}
+                                {%endif%}
+
+                                {% for place in range(min,max) %}
+                        <li {% if page==place %} class="am-active" {% endif %}><a
+                                href="{{url_for('bank.bank',page = place,refresh=0)}}">{{place+1}}</a>
+                        </li>
+                        {% endfor %}
+                        {%if tot//10+1>min+5 %}
+                        <li><a href="#">...</a></li>
+                        {%endif%}
+
+
+                        <li {% if page*10+10>tot %} class="am-disabled" {% endif %}><a
+                                href="{{url_for('bank.bank',page = page+1,refresh=0)}}">»</a></li>
+                    </ul>
                 </div>
-
             </div>
-        </div>
+            <hr/>
 
-        <footer class="admin-content-footer">
-            <hr>
-            <p class="am-padding-left">© 2019 Lee Adama</p>
-        </footer>
-
+        </form>
     </div>
-    <!-- content end -->
+
 </div>
 
-<a href="#" class="am-icon-btn am-icon-th-list am-show-sm-only admin-menu"
-   data-am-offcanvas="{target: '#admin-offcanvas'}"></a>
+{% endblock %}
 
-<footer>
-    <hr>
-    <p class="am-padding-left">© 2019 Lee Adama</p>
-</footer>
 
-<!--[if lt IE 9]>
-<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js') }}"></script>
-<script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/amazeui.ie8polyfill.min.js') }}"></script>
-<![endif]-->
-
-<!--[if (gte IE 9)|!(IE)]><!-->
-<script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
-<!--<![endif]-->
-<script src="{{ url_for('static', filename='assets/js/amazeui.min.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/app.js') }}"></script>
-</body>
-</html>
