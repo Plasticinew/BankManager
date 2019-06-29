@@ -72,16 +72,24 @@ def editbank(pk):
     if request.method == 'POST':
         city = request.form['bankcity']
         property = request.form['property']
-        error = None
+        bankname = request.form['bankname']
         print([pk, city, property])
 
         with session_scope() as session:
+
+            if bankname:
+                setBank(session, pk, bankname, 'BankName')
+                pk = bankname
+
             if city:
                 setBank(session, pk, city, 'City')
 
             if property:
                 setBank(session, pk, property, 'Property')
 
+        with session_scope() as session:
+            global cont
+            cont = getBank(session)
 
     return render_template("edit.html", type=2)
 
