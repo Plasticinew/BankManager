@@ -1,5 +1,5 @@
 import sqlalchemy as db
-from sqlalchemy import Column, CHAR, FLOAT, DATE
+from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -12,51 +12,129 @@ class BankClass(Base):
 
     BankName = db.Column(db.CHAR(255), primary_key=True, nullable=False)
     City = db.Column(db.CHAR(255), nullable=False)
-    Property = db.Column(db.INT, nullable=False)
-    #Workers = db.orm.relationship('银行员工')
+    Property = db.Column(db.FLOAT, nullable=False)
 
 
 class StaffClass(Base):
     __tablename__ = 'Staff'
 
     StaffID = db.Column(db.CHAR(18), primary_key=True, nullable=False)
-    BankName = db.Column(db.CHAR(255), db.ForeignKey('Bank.BankName'),nullable=False)
+    BankName = db.Column(db.CHAR(255), db.ForeignKey('Bank.BankName'))
     StaffName = db.Column(db.CHAR(18), nullable=False)
     Phone = db.Column(db.CHAR(14), nullable=False)
     Address = db.Column(db.CHAR(255), nullable=False)
     DateStartWorking = db.Column(db.DATE, nullable=False)
-    bankname = db.orm.relationship('BankClass',backref='StaffofBank')
+    bankname = db.orm.relationship('BankClass', backref='StaffofBank')
 
 
 class ClientClass(Base):
     __tablename__ = 'Client'
 
     ClientID = db.Column(db.CHAR(18), primary_key=True, nullable=False)
-    LinkID = db.Column(db.CHAR(18))
-    LinkName = db.Column(db.CHAR(16))
+    LinkID = db.Column(db.CHAR(18), ForeignKey('LinkMan.ClientID'))
+    LinkName = db.Column(db.CHAR(16), ForeignKey('LinkMan.LinkName'))
     ClientName = db.Column(db.CHAR(18), nullable=False)
     Phone = db.Column(db.CHAR(14), nullable=False)
     Address = db.Column(db.CHAR(255), nullable=False)
+    linkid = db.orm.relationship('LinkManClass', backref='ClientIDofLink', foreign_keys=[LinkID])
+    linkname = db.orm.relationship('LinkManClass', backref='ClientNameofLink', foreign_keys=[LinkName])
 
 
 class AccountClass(Base):
     __tablename__ = 'Account'
 
-    AccountID = Column(CHAR(11), nullable=True)
+    AccountID = Column(CHAR(11), primary_key=True, nullable=True)
     Balance = Column(FLOAT, nullable=True)
     DateOpening = Column(DATE, nullable=True)
 
 
+class CheckAccountClass(Base):
+    __tablename__ = 'CheckAccount'
 
+    AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
+    BankName = Column(CHAR(255), ForeignKey('OpenAccount.BankName'))
+    ClientID = Column(CHAR(18), ForeignKey('OpenAccount.ClientID'))
+    Balance = Column(FLOAT, nullable=True)
+    DateOpening = Column(DATE, nullable=True)
+    Overdraft = Column(FLOAT)
+    accountid = db.orm.relationship('AccountClass', backref='CheckofAccount', foreign_keys=[AccountID])
+    bankname = db.orm.relationship('OpenAccountClass', backref='CheckBankofOpen', foreign_keys=[BankName])
+    clientid = db.orm.relationship('OpenAccountClass', backref='CheckIDofOpen', foreign_keys=[ClientID])
+
+
+class SaveAccountClass(Base):
+    __tablename__ = 'SaveAccount'
+
+    AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
+    BankName = Column(CHAR(255), ForeignKey('OpenAccount.BankName'))
+    ClientID = Column(CHAR(18), ForeignKey('OpenAccount.ClientID'))
+    Balance = Column(FLOAT, nullable=True)
+    DateOpening = Column(DATE, nullable=True)
+    Rate = Column(FLOAT)
+    accountid = db.orm.relationship('AccountClass', backref='SaveofAccount', foreign_keys=[AccountID])
+    bankname = db.orm.relationship('OpenAccountClass', backref='SaveBankofOpen', foreign_keys=[BankName])
+    clientid = db.orm.relationship('OpenAccountClass', backref='SaveIDofOpen', foreign_keys=[ClientID])
+
+
+class OwningClass(Base):
+    __tablename__ = 'Owning'
+
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True)
+    LoanID = Column(CHAR(18), ForeignKey('Loan.LoanID'), primary_key=True)
+    clientid = db.orm.relationship('ClientClass', backref='OwnofClinet', foreign_keys=[ClientID])
+    loanid = db.orm.relationship('LoanClass', backref='OwnofLoan', foreign_keys=[LoanID])
+
+
+class LinkManClass(Base):
+    __tablename__ = 'LinkMan'
+
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True, nullable=True)
+    LinkName = Column(CHAR(16), primary_key=True, nullable=True)
+    Phone = Column(CHAR(14))
+    Email = Column(CHAR(14))
+    Association = Column(CHAR(128))
+    clientid = db.orm.relationship('ClientClass', backref='LinkofClient', foreign_keys=[ClientID])
+
+
+class LoanClass(Base):
+    __tablename__ = 'Loan'
+
+    LoanID = Column(CHAR(18), primary_key=True)
+    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'))
+    Amount = Column(FLOAT, nullable=True)
+    clientid = db.orm.relationship('BankClass', backref='LoanofBank')
+
+
+class PayLoanClass(Base):
+    __tablename__ = 'PayLoan'
+
+    PayID = Column(CHAR(18), primary_key=True)
+    LoanID = Column(CHAR(18), ForeignKey('Loan.LoanID'), primary_key=True)
+    Date = Column(DATE)
+    Amount = Column(CHAR(FLOAT))
+    loanid = db.orm.relationship('LoanClass', backref='PayofLoan')
+
+
+class OpenAccountClass(Base):
+    __tablename__ = 'OpenAccount'
+
+    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'), primary_key=True)
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True)
+    CheckAccountID = Column(CHAR(11), ForeignKey('CheckAccount.AccountID'))
+    SaveAccountID = Column(CHAR(11), ForeignKey('SaveAccount.AccountID'))
+    bankname = db.orm.relationship('BankClass', backref='AccountofBank', foreign_keys=[BankName])
+    clientid = db.orm.relationship('ClientClass', backref='AccountofCilent', foreign_keys=[ClientID])
+    checkaccountid = db.orm.relationship('CheckAccountClass', backref='OpenofCheck', foreign_keys=[CheckAccountID])
+    saveaccountid = db.orm.relationship('SaveAccountClass', backref='OpenofSave', foreign_keys=[SaveAccountID])
 
 
 class PersonInChargeClass(Base):
     __tablename__ = 'PersonInCharge'
 
-    ClientID = db.Column(db.CHAR(18), db.ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+    ClientID = db.Column(db.CHAR(18), db.ForeignKey('Client.ClientID'), primary_key=True, nullable=False)
     StaffID = db.Column(db.CHAR(18), db.ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
-
-
+    clientid = db.orm.relationship('ClientClass', backref='ChargeofClient', foreign_keys=[ClientID])
+    staffid = db.orm.relationship('StaffClass', backref='ChargeofStaff', foreign_keys=[StaffID])
 
 
 def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
@@ -89,14 +167,17 @@ def setBank(session, name, new, attribute):
 
 #待完成：考虑约束的删除
 def delBank(session, name):
-    if(len(session.query(BankClass).filter(BankClass.BankName == name).first().StaffofBank) == 0):
+    bank = session.query(BankClass).filter(BankClass.BankName == name).first()
+    if(len(bank.StaffofBank) == 0
+            and len(bank.AccountofBank) == 0
+            and len(bank.LoanofBank) == 0):
         session.delete(session.query(BankClass).filter(BankClass.BankName == name).first())
     else:
         raise Exception("ForeignKey constraint.")
 
 
 #date yyyy-mm-dd
-def getStaff(session, id='', bank='', name='', phone='', address='',startdate='', enddate='' ,smallfirst=True, orderby='StaffID'):
+def getStaff(session, id='', bank='', name='', phone='', address='',startdate='0000-01-01', enddate='9999-12-31' ,smallfirst=True, orderby='StaffID'):
     staffList=[]
     for staff in session.query(StaffClass) \
             .filter(StaffClass.StaffID.like('%'+id+'%'),
@@ -113,14 +194,14 @@ def getStaff(session, id='', bank='', name='', phone='', address='',startdate=''
 
 def newStaff(session, id, bank, name, phone, address, date):
     if(len(session.query(StaffClass).filter(StaffClass.StaffID == id).all()) == 0
-            & len(session.query(StaffClass).filter(StaffClass.BankName == bank).all()) != 0):
-        staff = StaffClass(id,bank,name,phone,address,date)
+            and len(session.query(BankClass).filter(BankClass.BankName == bank).all()) != 0):
+        staff = StaffClass(StaffID=id, BankName=bank, StaffName=name, Phone=phone, Address=address, DateStartWorking=date)
         session.add(staff)
     else:
         raise Exception("Staff Id Exists or Bank Name not found")
 
 
-def setStaff(session, attribute, id, new):
+def setStaff(session, id, new, attribute):
     staff = session.query(StaffClass).filter(StaffClass.StaffID == id).first()
     if(attribute == 'StaffID'):
         if (len(session.query(StaffClass).filter(
@@ -131,33 +212,121 @@ def setStaff(session, attribute, id, new):
     else:
         staff.__setattr__(attribute, new)
 
+
 def delStaff(session, id):
-    if (len(session.query(StaffClass).filter(StaffClass.StaffID == id).first().StaffofBank) == 0):
+    if (len(session.query(StaffClass).filter(StaffClass.StaffID == id).first().ChargeofStaff) == 0):
         session.delete(session.query(StaffClass).filter(StaffClass.StaffID == id).first())
     else:
         raise Exception("ForeignKey constraint.")
+
+
+def getClient(session, id='', name='', phone='', address= '', smallfirst=True, orderby='ClientID'):
+    clientList=[]
+    for client in session.query(ClientClass)\
+            .filter(ClientClass.ClientID.like('%'+id+'%'),
+                    ClientClass.ClientName.like('%'+name+'%'),
+                    ClientClass.Phone.like('%'+phone+'%'),
+                    ClientClass.Address.like('%'+address+'%'))\
+            .order_by((1 if smallfirst else -1)*ClientClass.__getattribute__(ClientClass, orderby)):
+        linkname=''
+        for i in client.LinkofClient:
+            linkname=linkname+i.LinkName
+        clientList.append([client.ClientID, client.ClientName, client.Phone, client.Address, linkname])
+    return clientList
+
+
+def newClient(session, id, name, phone, address):
+    if (len(session.query(ClientClass).filter(ClientClass.ClientID == id).all()) == 0):
+        client = ClientClass(ClientID=id, ClientName=name, Phone=phone, Address=address)
+        session.add(client)
+    else:
+        raise Exception("Staff Id Exists or Bank Name not found")
+
+
+#def addLink(session):
+
+
+def setClient(session, id, new, attribute):
+    client = session.query(ClientClass).filter(ClientClass.ClientID == id).first()
+    if (attribute == 'ClientID'):
+        if (len(session.query(ClientClass).filter(
+                ClientClass.__getattribute__(ClientClass, attribute) == new).all()) == 0):
+            client.__setattr__(attribute, new)
+        else:
+            raise Exception("Staff Name Exists!")
+    else:
+        client.__setattr__(attribute, new)
+
+
+def delClient(session):
+    client = session.query(ClientClass).filter(ClientClass.ClientID == id).first()
+    if (len(client.LinkofClient) == 0 ):
+        session.delete(session.query(ClientClass).filter(ClientClass.ClientID == id).first())
+    else:
+        raise Exception("ForeignKey constraint.")
+
+
+def getAccount(session,clientid, type='All', bank=''):
+    accountList=[]
+    for account in session.query(OpenAccountClass)\
+            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.BankName.like('%'+bank+'%'))\
+            .order_by(OpenAccountClass.ClientID):
+        if type != 'SaveAccount' and account.CheckAccountID != db.null :
+            checkaccount = account.checkaccountid
+            '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
+            accountList.append([checkaccount.AccountID, '支票账户', checkaccount.BankName, checkaccount.ClientID,
+                                checkaccount.Balance, checkaccount.DateOpening, checkaccount.Overdraft])
+        if type != 'CheckAccount' and account.SaveAccountID != db.null :
+            saveaccount = account.saveaccountid
+            '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
+            accountList.append([saveaccount.AccountID, '储蓄账户', saveaccount.BankName, saveaccount.ClientID,
+                                saveaccount.Balance, saveaccount.DateOpening, saveaccount.Rate, saveaccount.MoneyType])
+    return accountList
+
+
+#def addAccount(session):
+
+#def setAccount(session):
+
+#def delAccount(session):
+
+#def getLoan(session):
+
+#def setLoan(session):
+
+#def addLoan(session):
+
+#def delLoan(session):
+
+#def addPay(session):
+
+#def calculate(session):
+
 
 if __name__ == '__main__':
     #bank类的接口示例
     engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
     DBSession = sessionmaker(bind=engine)
     Session = DBSession()
-    #添加支行信息
+    delStaff(Session, '1145141919')
     try:
-        newBank(Session, '下北泽支行', '下北泽', 43962800)
-        newBank(Session, '合肥支行', '合肥', 1919810)
+        newStaff(Session, '114514', '下北泽支行', '李田所', '1145141919810', '下北泽', '1919-08-10')
     except Exception as e:
         print(e)
-    newBank(Session, '济南支行', '济南', 114514)
+    try:
+        newStaff(Session, '19580101', '合肥支行', 'cwk', '191919191919', '伯克利', '1999-09-09')
+    except Exception as e:
+        print(e)
     Session.commit()
     #获取按资产顺序排序的银行列表
-    print(getBank(Session, orderby='Property'))
+    print(getStaff(Session))
     #银行资产修改
-    setBank(Session,'济南支行', 11400, 'Property')
+    setStaff(Session,'114514', '1145141919', 'StaffID')
     Session.commit()
     #获取列表函数可选参数name、city、propertylow（下界）和propertyhigh（上界）
-    print(getBank(Session,city='济南',propertylow=1000,propertyhigh=1000000,orderby='City'))
+    print(getStaff(Session, orderby='DateStartWorking'))
     #根据name（primary key）删除支行
-    delBank(Session, '济南支行')
-    print(getBank(Session))
+    delStaff(Session, '19580101')
+    Session.commit()
+    print(getStaff(Session))
     
