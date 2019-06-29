@@ -22,15 +22,8 @@
     #增加一个新的支行，参数不能为空
     newBank(name, city, property)
 
-    #根据支行名称检索，修改已有支行名称，参数不能为空
-    setBankName(oldname, newname)
-
-    #根据支行名称检索，修改已有支行城市，参数不能为空
-    setBankCity(name, newcity)
-
-    #根据支行名称检索，修改已有支行的资产，参数不能为空
-    #参数change为增加/减少量，如-114
-    changeBankProperty(name, change)
+    #根据支行名称检索，修改已有支行对应属性，参数不能为空
+    setBank(name, new, attribute)
 
     #根据支行名称删除支行
     delBank(name)
@@ -47,9 +40,9 @@
     bank.newBank('合肥支行', '合肥', 1919810)
     bank.newBank('济南支行', '济南', 114514)
     #获取按资产顺序排序的银行列表
-    print(bank.getBankOrderByProperty())
+    print(bank.getBank(orderby='Property'))
     #银行资产修改
-    bank.changeBankProperty('济南支行', -514)
+    bank.setBank('济南支行', -514, 'Property')
     #获取列表函数可选参数name、city、propertylow（下界）和propertyhigh（上界）
     print(bank.getBank(city='济南',propertylow=1000, propertyhigh=1000000, orderby='City'))
     #根据name（primary key）删除支行

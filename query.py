@@ -48,22 +48,12 @@ class Bank:
             print("Bank Name Exists!")
         self.session.commit()
 
-    def setBankName(self, oldname, newname):
-        bank = self.session.query(BankClass).filter(BankClass.BankName == oldname).first()
-        if(len(self.session.query(BankClass).filter(BankClass.BankName == newname).all()) == 0):
-            bank.BankName = newname
+    def setBank(self, name, new, attribute):
+        bank = self.session.query(BankClass).filter(BankClass.BankName == name).first()
+        if(len(self.session.query(BankClass).filter(BankClass.__getattribute__(BankClass, attribute) == new).all()) == 0):
+            bank.__setattr__(attribute, new)
         else:
             print("Bank Name Exists!")
-        self.session.commit()
-
-    def setBankCity(self, name, newcity):
-        bank = self.session.query(BankClass).filter(BankClass.BankName == name).first()
-        bank.City = newcity
-        self.session.commit()
-
-    def changeBankProperty(self, name, change):
-        bank = self.session.query(BankClass).filter(BankClass.BankName == name).first()
-        bank.Property = bank.Property+change
         self.session.commit()
 
     #待完成：考虑约束的删除
@@ -93,12 +83,12 @@ if __name__ == '__main__':
     bank.newBank('合肥支行', '合肥', 1919810)
     bank.newBank('济南支行', '济南', 114514)
     #获取按资产顺序排序的银行列表
-    print(bank.getBankOrderByProperty())
+    print(bank.getBank(orderby='Property'))
     #银行资产修改
-    bank.changeBankProperty('济南支行', -514)
+    bank.setBank('济南支行', 11400, 'Property')
     #获取列表函数可选参数name、city、propertylow（下界）和propertyhigh（上界）
-    print(bank.getBankOrderByCity(city='济南',propertylow=1000,propertyhigh=1000000))
+    print(bank.getBank(city='济南',propertylow=1000,propertyhigh=1000000,orderby='City'))
     #根据name（primary key）删除支行
     bank.delBank('济南支行')
-    print(bank.getBankOrderByName())
+    print(bank.getBank())
     
