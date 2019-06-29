@@ -49,7 +49,7 @@ def delBank(session, name):
 
 
 #date yyyy-mm-dd
-def getStaff(session, id='', bank='', name='', phone='', address='',startdate='0000-01-01', enddate='9999-12-31' ,smallfirst=True, orderby='StaffID'):
+def getStaff(session, id='', bank='', name='', phone='', address='',startdate='0000-01-01', enddate='9999-12-31', smallfirst=True, orderby='StaffID'):
     staffList=[]
     '''员工ID，所在支行，员工姓名，手机，住址，开始工作日期'''
     for staff in session.query(StaffClass) \
@@ -160,44 +160,48 @@ def getAccount(session, clientid='', clientname='', type='All', bank=''):
     return checkaccountList, saveaccountList
 
 
-def addSaveAccount(session, accountid, clientid, bank, balance, date, rate, moneytype):
+def newSaveAccount(session, accountid, clientid, bank, balance, date, rate, moneytype):
     if (len(session.query(AccountClass).filter(AccountClass.AccountID == accountid).all()) == 0):
-        account = AccountClass(AcountID = accountid, Balance = balance, DateOpening = date)
+        account = AccountClass(AccountID = accountid, Balance = balance, DateOpening = date)
         session.add(account)
     else:
         raise Exception("Account Id Exists")
+    if (len(session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).all()) == 0):
+        account = SaveAccountClass(AccountID=accountid,
+                                   Balance=balance, DateOpening=date, Rate=rate, MoneyType=moneytype)
+        session.add(account)
+    else:
+        raise Exception("Account Id Exists")
+    session.commit()
     openaccount = session.query(OpenAccountClass).filter(OpenAccountClass.BankName == bank,
-                                                         OpenAccountClass.ClientID == clientid).first()
+                                                         OpenAccountClass.ClientID == clientid).all()
     if (len(openaccount) == 0):
-        openaccount = OpenAccountClass(BankName=bank, ClientID=clientid)
+        openaccount = OpenAccountClass(BankName=bank, ClientID=clientid, SaveAccountID=accountid)
         session.add(openaccount)
-    if(len(session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).all()) == 0):
-        account = SaveAccountClass(AcountID=accountid, BankName=bank, ClientID=clientid,
-                               Balance=balance, DateOpening=date, Rate=rate, MoneyType=moneytype)
-        session.add(account)
     else:
-        raise Exception("Account Id Exists")
-    openaccount.SaveAccountID = clientid
+        openaccount[0].SaveAccountID = accountid
 
 
-def addCheckAccount(session, accountid, clientid, bank, balance, date, overdraft):
+def newCheckAccount(session, accountid, clientid, bank, balance, date, overdraft):
     if (len(session.query(AccountClass).filter(AccountClass.AccountID == accountid).all()) == 0):
-        account = AccountClass(AcountID=accountid, Balance=balance, DateOpening=date)
+        account = AccountClass(AccountID=accountid, Balance=balance, DateOpening=date)
         session.add(account)
     else:
         raise Exception("Account Id Exists")
-    openaccount=session.query(OpenAccountClass).filter(OpenAccountClass.BankName == bank,
-                                           OpenAccountClass.ClientID == clientid).first()
-    if(len(openaccount) == 0):
-        openaccount = OpenAccountClass(BankName=bank, ClientID=clientid)
-        session.add(openaccount)
     if (len(session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).all()) == 0):
-        account = CheckAccountClass(AcountID=accountid, BankName=bank, ClientID=clientid,
-                               Balance=balance, DateOpening=date, Overdraft=overdraft)
+        account = CheckAccountClass(AccountID=accountid, Balance=balance, DateOpening=date, Overdraft=overdraft)
         session.add(account)
     else:
         raise Exception("Account Id Exists")
-    openaccount.CheckAccountID = clientid
+    print(bank)
+    session.commit()
+    openaccount=session.query(OpenAccountClass).filter(OpenAccountClass.BankName == bank,
+                                           OpenAccountClass.ClientID == clientid).all()
+    if(len(openaccount) == 0):
+        openaccount = OpenAccountClass(BankName=bank, ClientID=clientid, CheckAccountID=accountid, SaveAccountID=None)
+        session.add(openaccount)
+    else:
+        openaccount[0].CheckAccountID = accountid
 
 
 
@@ -253,7 +257,7 @@ def getPay(session, loanid):
     return payList
 
 
-def addLoan(session, loanid, clientidlist, bank, amount):
+def newLoan(session, loanid, clientidlist, bank, amount):
     loan = LoanClass(LoanID=loanid, BankName=bank, Amount=amount)
     session.add(loan)
     for owner in clientidlist:
@@ -287,25 +291,19 @@ if __name__ == '__main__':
     engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
     DBSession = sessionmaker(bind=engine)
     Session = DBSession()
-    delStaff(Session, '1145141919')
-    try:
-        newStaff(Session, '114514', '下北泽支行', '李田所', '1145141919810', '下北泽', '1919-08-10')
-    except Exception as e:
-        print(e)
-    try:
-        newStaff(Session, '19580101', '合肥支行', 'cwk', '191919191919', '伯克利', '1999-09-09')
-    except Exception as e:
-        print(e)
-    Session.commit()
-    #获取按资产顺序排序的银行列表
-    print(getStaff(Session))
-    #银行资产修改
-    setStaff(Session,'114514', '1145141919', 'StaffID')
-    Session.commit()
-    #获取列表函数可选参数name、city、propertylow（下界）和propertyhigh（上界）
-    print(getStaff(Session, orderby='DateStartWorking'))
-    #根据name（primary key）删除支行
-    delStaff(Session, '19580101')
-    Session.commit()
-    print(getStaff(Session))
-    
+    # newBank(Session, '合肥支行','合肥',114514)
+    # Session.commit()
+    # newClient(Session, '1234', 'pdd', '4321', '合肥')
+    # newClient(Session, '4396', 'clear', '7777', '上海')
+    # Session.commit()
+    # newCheckAccount(Session, '11111', '4396', '合肥支行', 7777, '2008-01-20', 6666)
+    # Session.commit()
+    # newCheckAccount(Session, '22222', '1234', '合肥支行', 7776, '2008-01-22', 6666)
+    # Session.commit()
+    # newSaveAccount(Session, '33333', '4396', '合肥支行', 77778, '2009-01-20', 6666, 'RMB')
+    # Session.commit()
+    #newStaff(Session, 'ba', '合肥支行', 'ab', '4321', '合肥', '2000-12-11')
+    #newStaff(Session, 'ab', '合肥支行', 'ba', '1234', '合肥', '1999-12-11')
+    #Session.commit()
+    print(getStaff(session=Session, orderby='StaffID'))
+    print(getStaff(session=Session, orderby='StaffName'))
