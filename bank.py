@@ -5,11 +5,15 @@ from flask import redirect
 from flask import url_for
 from flask import render_template
 
-from BankManager.db import get_dbSession
-# from BankManager.db import BankQuery
-from BankManager.db import Bank
-from BankManager.auth import login_required
+from BankManager.db import session_scope
 
+# from BankManager.auth import login_required
+
+from BankManager.query import getBank, newBank, setBank
+
+with session_scope() as session:
+    global cont
+    cont = getBank(session)
 
 
 bp = Blueprint("bank", __name__)
@@ -23,59 +27,76 @@ def index(page=None):
 def bank(page=None):
     if not page:
         page = 0
-    cont = getBankOrderByName()
     if request.method == 'POST':
         name = request.form['name']
         city = request.form['city']
         waytosort = request.form['way']
         if waytosort == 'option2':
-            cont = getBankOrderByName(name, city)
-
+            with session_scope() as session:
+                global cont
+                cont = getBank(session, name=name, city=city)
     return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 
 @bp.route("/addbank", methods=('GET', 'POST'))
+# @login_required
 def addbank():
     if request.method == 'POST':
-        bankname = request.form['bankname']
-        bankcity = request.form['bankcity']
-        property = request.form['property']
-        print([bankname, bankcity, property])
-    return render_template("add.html", type=0)
-
-@bp.route("/create", methods=("GET", "POST"))
-@login_required
-def create():
-    if request.method == "POST":
-        bankname = request.form["BankName"]
-        city = request.form["City"]
-        property = request.form["Property"]
+        print("hello")
+        bankname = request.form["bankname"]
+        city = request.form["bankcity"]
+        property = request.form["property"]
         error = None
-
-        if not bankname:
+        print([bankname, city, property])
+        if bankname == '':
+            print("null bankname")
             error = "Bank Name is required."
 
-        if not city:
+        if city == '':
+            print("null city")
             error = "City is required."
 
-        if not property:
+        if property == '':
+            print("null property")
             error = "Property is required."
 
         if error is not None:
+            print("error!")
             flash(error)
         else:
-            DBSession = get_dbSession()
-            DBSession.add(Bank(\
-                BankName=bankname, City=city,\
-                Property=property))
-            DBSession.commit()
-            return redirect(url_for("bank.index"))
+            with session_scope() as session:
+                newBank(session, bankname, city, int(property))
+    return render_template("add.html", type=2)
 
-def getBankOrderByName(name='', city='', ascending=True):
-    session = get_dbSession()
-    banklist = []
-    for bank in session.query(Bank)\
-        .filter(Bank.BankName.like('%' + name + '%'),\
-                Bank.City.like('%' + city + '%')):
-        # .order_by((1 if ascending else -1) * Bank.BankName):
-        banklist.append((bank.BankName, bank.City, bank.Property))
-    return banklist
+@bp.route("/editbank<string:pk>", methods=('GET', 'POST'))
+def editbank(pk):
+    if request.method == 'POST':
+        city = request.form['bankcity']
+        property = request.form['property']
+        bankname = request.form['bankname']
+        print([pk, city, property])
+
+        with session_scope() as session:
+
+            if bankname:
+                setBank(session, pk, bankname, 'BankName')
+                pk = bankname
+
+            if city:
+                setBank(session, pk, city, 'City')
+
+            if property:
+                setBank(session, pk, property, 'Property')
+
+        with session_scope() as session:
+            global cont
+            cont = getBank(session)
+
+    return render_template("edit.html", type=2)
+
+@bp.route("/delbank<string:pk>", methods=('GET', 'POST'))
+def delbank(pk):
+
+    return render_template("del.html", type=2, succ=1)
+@bp.route("/login", methods=("GET", "POST"))
+def login():
+    return render_template("login.html")
