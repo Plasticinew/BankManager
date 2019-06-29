@@ -26,6 +26,7 @@ class StaffClass(Base):
     DateStartWorking = db.Column(db.DATE, nullable=False)
     bankname = db.orm.relationship('BankClass',backref='StaffofBank')
 
+
 def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
     bankList=[]
     for bank in session.query(BankClass) \
@@ -34,12 +35,14 @@ def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, s
         bankList.append([bank.BankName, bank.City, bank.Property])
     return bankList
 
+
 def newBank(session, name, city, property):
     if(len(session.query(BankClass).filter(BankClass.BankName == name).all()) == 0):
         bank = BankClass(BankName=name, City=city, Property=property)
         session.add(bank)
     else:
         raise Exception("Bank Name Exists!")
+
 
 def setBank(session, name, new, attribute):
     bank = session.query(BankClass).filter(BankClass.BankName == name).first()
@@ -51,6 +54,7 @@ def setBank(session, name, new, attribute):
     else:
         bank.__setattr__(attribute, new)
 
+
 #待完成：考虑约束的删除
 def delBank(session, name):
     if(len(session.query(BankClass).filter(BankClass.BankName == name).first().StaffofBank) == 0):
@@ -59,45 +63,40 @@ def delBank(session, name):
         raise Exception("ForeignKey constraint.")
 
 
-class Staff:
-    def __init__(self, session):
-        self.session = session
+#date yyyy-mm-dd
+def getStaff(self, id='', bank='', name='', phone='', address='',startdate='', enddate='' ,smallfirst=True, orderby='StaffID'):
+    staffList=[]
+    for staff in self.session.query(StaffClass) \
+            .filter(StaffClass.StaffID.like('%'+id+'%'),
+                    StaffClass.BankName.like('%'+bank+'%'),
+                    StaffClass.StaffName.like('%'+name+'%'),
+                    StaffClass.Phone.like('%'+phone+'%'),
+                    StaffClass.Address.like('%'+address+'%'),
+                    StaffClass.DateStartWorking > startdate,
+                    StaffClass.DateStartWorking < enddate)\
+            .order_by((1 if smallfirst else -1)*StaffClass.__getattribute__(StaffClass, orderby)):
+        staffList.append([staff.StaffID, staff.BankName, staff.StaffName, staff.Phone, staff.Address, staff.DateStartWorking])
+    return staffList
 
-    '''
-    date yyyy-mm-dd
-    '''
-    def getStaff(self, id='', bank='', name='', phone='', address='',startdate='', enddate='' ,smallfirst=True, orderby='StaffID'):
-        staffList=[]
-        for staff in self.session.query(StaffClass) \
-                .filter(StaffClass.StaffID.like('%'+id+'%'),
-                        StaffClass.BankName.like('%'+bank+'%'),
-                        StaffClass.StaffName.like('%'+name+'%'),
-                        StaffClass.Phone.like('%'+phone+'%'),
-                        StaffClass.Address.like('%'+address+'%'),
-                        StaffClass.DateStartWorking > startdate,
-                        StaffClass.DateStartWorking < enddate)\
-                .order_by((1 if smallfirst else -1)*StaffClass.__getattribute__(StaffClass, orderby)):
-            staffList.append([staff.StaffID, staff.BankName, staff.StaffName, staff.Phone, staff.Address, staff.DateStartWorking])
-        return staffList
 
-    def newStaff(self, name, city, property):
-        if(len(self.session.query(BankClass).filter(BankClass.BankName == name).all()) == 0):
-            bank = BankClass(BankName=name, City=city, Property=property)
-            self.session.add(bank)
+def newStaff(self, name, city, property):
+    if(len(self.session.query(BankClass).filter(BankClass.BankName == name).all()) == 0):
+        bank = BankClass(BankName=name, City=city, Property=property)
+        self.session.add(bank)
+    else:
+        raise Exception("Bank Name Exists!")
+
+
+def setStaff(self, attribute, id, new):
+    staff = self.session.query(StaffClass).filter(StaffClass.StaffID == id).first()
+    if(attribute == 'StaffID'):
+        if (len(self.session.query(StaffClass).filter(
+                StaffClass.__getattribute__(StaffClass, attribute) == new).all()) == 0):
+            staff.__setattr__(attribute, new)
         else:
             raise Exception("Bank Name Exists!")
-
-    def setStaff(self, attribute, id, new):
-        staff = self.session.query(StaffClass).filter(StaffClass.StaffID == id).first()
-        if(attribute == 'StaffID'):
-            if (len(self.session.query(StaffClass).filter(
-                    StaffClass.__getattribute__(StaffClass, attribute) == new).all()) == 0):
-                staff.__setattr__(attribute, new)
-            else:
-                raise Exception("Bank Name Exists!")
-        else:
-            staff.__setattr__(attribute, new)
-
+    else:
+        staff.__setattr__(attribute, new)
 
 
 if __name__ == '__main__':
