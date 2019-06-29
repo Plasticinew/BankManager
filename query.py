@@ -1,4 +1,5 @@
 import sqlalchemy as db
+from sqlalchemy import Column, CHAR, FLOAT, DATE
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -25,6 +26,37 @@ class StaffClass(Base):
     Address = db.Column(db.CHAR(255), nullable=False)
     DateStartWorking = db.Column(db.DATE, nullable=False)
     bankname = db.orm.relationship('BankClass',backref='StaffofBank')
+
+
+class ClientClass(Base):
+    __tablename__ = 'Client'
+
+    ClientID = db.Column(db.CHAR(18), primary_key=True, nullable=False)
+    LinkID = db.Column(db.CHAR(18))
+    LinkName = db.Column(db.CHAR(16))
+    ClientName = db.Column(db.CHAR(18), nullable=False)
+    Phone = db.Column(db.CHAR(14), nullable=False)
+    Address = db.Column(db.CHAR(255), nullable=False)
+
+
+class AccountClass(Base):
+    __tablename__ = 'Account'
+
+    AccountID = Column(CHAR(11), nullable=True)
+    Balance = Column(FLOAT, nullable=True)
+    DateOpening = Column(DATE, nullable=True)
+
+
+
+
+
+class PersonInChargeClass(Base):
+    __tablename__ = 'PersonInCharge'
+
+    ClientID = db.Column(db.CHAR(18), db.ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+    StaffID = db.Column(db.CHAR(18), db.ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+
+
 
 
 def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
@@ -64,9 +96,9 @@ def delBank(session, name):
 
 
 #date yyyy-mm-dd
-def getStaff(self, id='', bank='', name='', phone='', address='',startdate='', enddate='' ,smallfirst=True, orderby='StaffID'):
+def getStaff(session, id='', bank='', name='', phone='', address='',startdate='', enddate='' ,smallfirst=True, orderby='StaffID'):
     staffList=[]
-    for staff in self.session.query(StaffClass) \
+    for staff in session.query(StaffClass) \
             .filter(StaffClass.StaffID.like('%'+id+'%'),
                     StaffClass.BankName.like('%'+bank+'%'),
                     StaffClass.StaffName.like('%'+name+'%'),
@@ -79,25 +111,31 @@ def getStaff(self, id='', bank='', name='', phone='', address='',startdate='', e
     return staffList
 
 
-def newStaff(self, name, city, property):
-    if(len(self.session.query(BankClass).filter(BankClass.BankName == name).all()) == 0):
-        bank = BankClass(BankName=name, City=city, Property=property)
-        self.session.add(bank)
+def newStaff(session, id, bank, name, phone, address, date):
+    if(len(session.query(StaffClass).filter(StaffClass.StaffID == id).all()) == 0
+            & len(session.query(StaffClass).filter(StaffClass.BankName == bank).all()) != 0):
+        staff = StaffClass(id,bank,name,phone,address,date)
+        session.add(staff)
     else:
-        raise Exception("Bank Name Exists!")
+        raise Exception("Staff Id Exists or Bank Name not found")
 
 
-def setStaff(self, attribute, id, new):
-    staff = self.session.query(StaffClass).filter(StaffClass.StaffID == id).first()
+def setStaff(session, attribute, id, new):
+    staff = session.query(StaffClass).filter(StaffClass.StaffID == id).first()
     if(attribute == 'StaffID'):
-        if (len(self.session.query(StaffClass).filter(
+        if (len(session.query(StaffClass).filter(
                 StaffClass.__getattribute__(StaffClass, attribute) == new).all()) == 0):
             staff.__setattr__(attribute, new)
         else:
-            raise Exception("Bank Name Exists!")
+            raise Exception("Staff Name Exists!")
     else:
         staff.__setattr__(attribute, new)
 
+def delStaff(session, id):
+    if (len(session.query(StaffClass).filter(StaffClass.StaffID == id).first().StaffofBank) == 0):
+        session.delete(session.query(StaffClass).filter(StaffClass.StaffID == id).first())
+    else:
+        raise Exception("ForeignKey constraint.")
 
 if __name__ == '__main__':
     #bank类的接口示例
