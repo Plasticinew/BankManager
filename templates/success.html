@@ -1,0 +1,20 @@
+{% extends "template.html" %}
+{% block title %}<strong class="am-text-primary am-text-lg">表单</strong> /
+<small>form</small>{% endblock %}
+
+{% block body %}
+<div class="am-u-sm-12 am-u-sm-push-3">
+    <h2>{%if succ==1%}成功{{action}}{%else%}{{action}}失败<p>{{messege}}</p>{%endif%}</h2>
+    {%if showurl %}
+    <div class="am-u-sm-12"></div>
+    <div class="am-u-sm-12">
+        <a href="{{url_for('bank.bank',page = 0)}}">
+            <button type="button" class="am-btn am-btn-primary">返回</button>
+        </a>
+    </div>
+    {%endif%}
+
+    <hr>
+</div>
+
+{% endblock %}
