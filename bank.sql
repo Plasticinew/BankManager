@@ -212,53 +212,53 @@ DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_bin;
 
 alter table CheckAccount add constraint FK_Relationship_15 foreign key (BankName, ClientID)
-      references OpenAccount (BankName, ClientID) on delete restrict on update restrict;
+      references OpenAccount (BankName, ClientID) on delete Set NULL on update Set NULL;
 
 alter table CheckAccount add constraint FK_AccountType foreign key (AccountID)
-      references Account (AccountID) on delete restrict on update restrict;
+      references Account (AccountID) on delete Set NULL on update Set NULL;
 
 alter table Client add constraint FK_Link foreign key (LinkID, LinkName)
-      references LinkMan (ClientID, LinkName) on delete restrict on update restrict;
+      references LinkMan (ClientID, LinkName) on delete Set NULL on update Set NULL;
 
 alter table Owning add constraint FK_Owning foreign key (ClientID)
-      references Client (ClientID) on delete restrict on update restrict;
+      references Client (ClientID) on delete Set NULL on update Set NULL;
 
 alter table Owning add constraint FK_Owning2 foreign key (LoanID)
-      references Loan (LoanID) on delete restrict on update restrict;
+      references Loan (LoanID) on delete Set NULL on update Set NULL;
 
 alter table LinkMan add constraint FK_Link2 foreign key (ClientID)
-      references Client (ClientID) on delete restrict on update restrict;
+      references Client (ClientID) on delete Set NULL on update Set NULL;
 
 alter table Loan add constraint FK_Send foreign key (BankName)
-      references Bank (BankName) on delete restrict on update restrict;
+      references Bank (BankName) on delete Set NULL on update Set NULL;
 
 alter table OpenAccount add constraint FK_Relationship_13 foreign key (BankName)
-      references Bank (BankName) on delete restrict on update restrict;
+      references Bank (BankName) on delete Set NULL on update Set NULL;
 
 alter table OpenAccount add constraint FK_Relationship_14 foreign key (ClientID)
-      references Client (ClientID) on delete restrict on update restrict;
+      references Client (ClientID) on delete Set NULL on update Set NULL;
 
 alter table OpenAccount add constraint FK_Relationship_16 foreign key (SaveAccountID)
-      references CheckAccount (AccountID) on delete restrict on update restrict;
+      references CheckAccount (AccountID) on delete Set NULL on update Set NULL;
 
 alter table OpenAccount add constraint FK_Relationship_18 foreign key (CheckAccountID)
-      references SaveAccount (AccountID) on delete restrict on update restrict;
+      references SaveAccount (AccountID) on delete Set NULL on update Set NULL;
 
 alter table PayLoan add constraint FK_PayInstalments foreign key (LoanID)
-      references Loan (LoanID) on delete restrict on update restrict;
+      references Loan (LoanID) on delete Set NULL on update Set NULL;
 
 alter table PersonInCharge add constraint FK_Charge foreign key (ClientID)
-      references Client (ClientID) on delete restrict on update restrict;
+      references Client (ClientID) on delete Set NULL on update Set NULL;
 
 alter table PersonInCharge add constraint FK_Charge2 foreign key (StaffID)
-      references Staff (StaffID) on delete restrict on update restrict;
+      references Staff (StaffID) on delete Set NULL on update Set NULL;
 
 alter table SaveAccount add constraint FK_Relationship_17 foreign key (BankName, ClientID)
-      references OpenAccount (BankName, ClientID) on delete restrict on update restrict;
+      references OpenAccount (BankName, ClientID) on delete Set NULL on update Set NULL;
 
 alter table SaveAccount add constraint FK_AccountType2 foreign key (AccountID)
-      references Account (AccountID) on delete restrict on update restrict;
+      references Account (AccountID) on delete Set NULL on update Set NULL;
 
 alter table Staff add constraint FK_WorkOn foreign key (BankName)
-      references Bank (BankName) on delete restrict on update restrict;
+      references Bank (BankName) on delete Set NULL on update Set NULL;
 

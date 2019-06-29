@@ -1,21 +1,43 @@
-import sqlite3
-
 import click
 from flask import current_app
 from flask import g
 from flask.cli import with_appcontext
 
+import os
+import sys
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, Float
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy import text
 
-def get_db():
+engine = create_engine( \
+    'mysql+mysqlconnector://root:mayuxin1999@localhost:3306/bankdbms')
+DBSession = sessionmaker(bind=engine)
+
+Base = declarative_base()
+
+
+class Bank(Base):
+    __tablename__ = 'Bank'
+
+    BankName = Column(String(255), primary_key=True, nullable=False)
+    City = Column(String(255), nullable=False)
+    Property = Column(Integer, nullable=False)
+
+    # Workers = db.orm.relationship('银行员工')
+
+    def __repr__(self):
+        return "<Bank(BankName = '%s', City = '%s', Property = '%d')" \
+               % (self.BankName, self.City, self.Property)
+
+def get_dbSession():
     """Connect to the application's configured database. The connection
     is unique for each request and will be reused if this is called
     again.
     """
     if "db" not in g:
-        g.db = sqlite3.connect(
-            current_app.config["DATABASE"], detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
+        g.db = DBSession()
 
     return g.db
 
@@ -32,10 +54,11 @@ def close_db(e=None):
 
 def init_db():
     """Clear existing data and create new tables."""
-    db = get_db()
-
-    with current_app.open_resource("schema.sql") as f:
-        db.executescript(f.read().decode("utf8"))
+    db = engine.connect()
+    tables = list(reversed(Base.metadata.sorted_tables))
+    for table in tables:
+        table.drop(engine)
+    Base.metadata.create_all(engine)
 
 
 @click.command("init-db")

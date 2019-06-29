@@ -26,20 +26,16 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    @app.route("/hello")
-    def hello():
-        return "Hello, World!"
-
     # register the database commands
     from BankManager import db
 
     db.init_app(app)
 
     # apply the blueprints to the app
-    from BankManager import auth, blog
+    from BankManager import auth, bank
 
     app.register_blueprint(auth.bp)
-    app.register_blueprint(blog.bp)
+    app.register_blueprint(bank.bp)
 
     # make url_for('index') == url_for('blog.index')
     # in another app, you might define a separate main index here with
