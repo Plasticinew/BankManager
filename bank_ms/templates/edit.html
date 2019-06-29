@@ -16,6 +16,9 @@
         {%if type==2 %}
         <li class="am-active"><a href="#tab3">修改支行</a></li>
         {%endif%}
+        {%if type==3 %}
+        <li class="am-active"><a href="#tab4">修改客户</a></li>
+        {%endif%}
     </ul>
 
     <div class="am-tabs-bd">
@@ -107,10 +110,10 @@
             <form class="am-form" method="post">
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
-                        <label for="stuffid">员工ID</label>
+                        <label for="staffid">员工ID</label>
                     </div>
                     <div class="am-u-sm-8 am-u-md-4 am-u-end">
-                        <input type="text" class="am-input-sm" name="stuffid" id="stuffid">
+                        <input type="text" class="am-input-sm" name="staffid" id="staffid">
                     </div>
                 </div>
                 <div class="am-g am-margin-top-sm">
@@ -123,19 +126,19 @@
                 </div>
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
-                        <label for="stuffname">姓名</label>
+                        <label for="staffname">姓名</label>
                     </div>
                     <div class="am-u-sm-8 am-u-md-4 am-u-end">
-                        <input type="text" class="am-input-sm" name="stuffname" id="stuffname">
+                        <input type="text" class="am-input-sm" name="staffname" id="staffname">
                     </div>
                 </div>
 
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
-                        <label for="property">手机号</label>
+                        <label for="phone">手机号</label>
                     </div>
                     <div class="am-u-sm-8 am-u-md-4 am-u-end">
-                        <input type="text" class="am-input-sm" name="property" id="property">
+                        <input type="text" class="am-input-sm" name="phone" id="phone">
                     </div>
                 </div>
                 <div class="am-g am-margin-top-sm">
@@ -171,6 +174,45 @@
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
                         <label for="bankname">支行名称</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="bankname" id="bankname">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="bankcity">所在城市</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="bankcity" id="bankcity">
+                    </div>
+                </div>
+
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="property">资产</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="property" id="property">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="submit" value="提交修改" class="am-btn am-btn-primary am-btn-xs">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        {%endif%}
+        {%if type==3 %}
+        <div class="am-tab-panel am-active">
+            <form class="am-form" method="post">
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="bankname">客户id</label>
                     </div>
                     <div class="am-u-sm-8 am-u-md-4 am-u-end">
                         <input type="text" class="am-input-sm" name="bankname" id="bankname">

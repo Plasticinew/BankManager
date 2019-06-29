@@ -110,8 +110,8 @@ def bank(page=None):
     return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 
 
-@bp.route("/stuff<int:page>", methods=('GET', 'POST'))
-def stuff(page=None):
+@bp.route("/staff<int:page>", methods=('GET', 'POST'))
+def staff(page=None):
     if not page:
         page = 0
 
@@ -121,49 +121,49 @@ def stuff(page=None):
             ]
 
     if request.method == 'POST':
-        stuffid = request.form['stuffid']
+        staffid = request.form['staffid']
         bankname = request.form['bankname']
-        stuffname = request.form['stuffname']
+        staffname = request.form['staffname']
         phone = request.form['phone']
         minp = request.form['mindate']
         maxp = request.form['maxdate']
         waytosort = request.form['way']
 
-    return render_template("stuff-table.html", page=page, cont=cont, tot=len(cont))
+    return render_template("staff-table.html", page=page, cont=cont, tot=len(cont))
 
 
-@bp.route("/addstuff", methods=('GET', 'POST'))
-def addstuff():
+@bp.route("/addstaff", methods=('GET', 'POST'))
+def addstaff():
     if request.method == 'POST':
-        stuffid = request.form['stuffid']
+        staffid = request.form['staffid']
         bankname = request.form['bankname']
-        stuffname = request.form['stuffname']
+        staffname = request.form['staffname']
         address = request.form['address']
         phone = request.form['phone']
         datestartworking = request.form['datestartworking']
 
-        return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.stuff", page=0),
+        return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.staff", page=0),
                                messege=None)
-    return render_template("add.html", type=1)
-
-
-@bp.route("/editstuff<string:pk>", methods=('GET', 'POST'))
-def editstuff(pk):
-    if request.method == 'POST':
-        stuffid = request.form['stuffid']
-        bankname = request.form['bankname']
-        stuffname = request.form['stuffname']
-        address = request.form['address']
-        phone = request.form['phone']
-        datestartworking = request.form['datestartworking']
-
-        return render_template("success.html", action="修改", succ=1, showurl=url_for("bank.stuff", page=0), messege=None)
     return render_template("edit.html", type=1)
 
 
-@bp.route("/delstuff<string:pk>", methods=('GET', 'POST'))
-def delstuff(pk):
-    return render_template("success.html", action="删除", succ=1, showurl=url_for("bank.stuff", page=0), messege=None)
+@bp.route("/editstaff<string:pk>", methods=('GET', 'POST'))
+def editstaff(pk):
+    if request.method == 'POST':
+        staffid = request.form['staffid']
+        bankname = request.form['bankname']
+        staffname = request.form['staffname']
+        address = request.form['address']
+        phone = request.form['phone']
+        datestartworking = request.form['datestartworking']
+
+        return render_template("success.html", action="修改", succ=1, showurl=url_for("bank.staff", page=0), messege=None)
+    return render_template("edit.html", type=1)
+
+
+@bp.route("/delstaff<string:pk>", methods=('GET', 'POST'))
+def delstaff(pk):
+    return render_template("success.html", action="删除", succ=1, showurl=url_for("bank.staff", page=0), messege=None)
 
 
 @bp.route("/addbank", methods=('GET', 'POST'))
@@ -175,7 +175,7 @@ def addbank():
         print([bankname, bankcity, property])
         return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.bank", page=0),
                                messege=None)
-    return render_template("add.html", type=2)
+    return render_template("edit.html", type=2)
 
 
 @bp.route("/editbank<string:pk>", methods=('GET', 'POST'))
