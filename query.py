@@ -2,8 +2,9 @@ import sqlalchemy as db
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from BankManager.db import BankClass, StaffClass, \
-ClientClass, AccountClass, PersonInChargeClass
+from db import BankClass, StaffClass, \
+ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
+SaveAccountClass, CheckAccountClass
 
 
 
@@ -49,6 +50,7 @@ def delBank(session, name):
 #date yyyy-mm-dd
 def getStaff(session, id='', bank='', name='', phone='', address='',startdate='0000-01-01', enddate='9999-12-31' ,smallfirst=True, orderby='StaffID'):
     staffList=[]
+    '''员工ID，所在支行，员工姓名，手机，住址，开始工作日期'''
     for staff in session.query(StaffClass) \
             .filter(StaffClass.StaffID.like('%'+id+'%'),
                     StaffClass.BankName.like('%'+bank+'%'),
@@ -136,39 +138,144 @@ def delClient(session):
         raise Exception("ForeignKey constraint.")
 
 
-def getAccount(session,clientid, type='All', bank=''):
-    accountList=[]
+def getAccount(session, clientid='', clientname='', type='All', bank=''):
+    checkaccountList=[]
+    saveaccountList=[]
+    namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
     for account in session.query(OpenAccountClass)\
-            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.BankName.like('%'+bank+'%'))\
+            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.ClientID.in_(namelist), OpenAccountClass.BankName.like('%'+bank+'%'))\
             .order_by(OpenAccountClass.ClientID):
         if type != 'SaveAccount' and account.CheckAccountID != db.null :
             checkaccount = account.checkaccountid
-            '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
-            accountList.append([checkaccount.AccountID, '支票账户', checkaccount.BankName, checkaccount.ClientID,
+            '''账户ID，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
+            checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,
                                 checkaccount.Balance, checkaccount.DateOpening, checkaccount.Overdraft])
         if type != 'CheckAccount' and account.SaveAccountID != db.null :
             saveaccount = account.saveaccountid
             '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
-            accountList.append([saveaccount.AccountID, '储蓄账户', saveaccount.BankName, saveaccount.ClientID,
+            saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,
                                 saveaccount.Balance, saveaccount.DateOpening, saveaccount.Rate, saveaccount.MoneyType])
-    return accountList
+    return checkaccountList, saveaccountList
 
 
-#def addAccount(session):
+def addSaveAccount(session, accountid, clientid, bank, balance, date, rate, moneytype):
+    if (len(session.query(AccountClass).filter(AccountClass.AccountID == accountid).all()) == 0):
+        account = AccountClass(AcountID = accountid, Balance = balance, DateOpening = date)
+        session.add(account)
+    else:
+        raise Exception("Account Id Exists")
+    openaccount = session.query(OpenAccountClass).filter(OpenAccountClass.BankName == bank,
+                                                         OpenAccountClass.ClientID == clientid).first()
+    if (len(openaccount) == 0):
+        openaccount = OpenAccountClass(BankName=bank, ClientID=clientid)
+        session.add(openaccount)
+    if(len(session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).all()) == 0):
+        account = SaveAccountClass(AcountID=accountid, BankName=bank, ClientID=clientid,
+                               Balance=balance, DateOpening=date, Rate=rate, MoneyType=moneytype)
+        session.add(account)
+    else:
+        raise Exception("Account Id Exists")
+    openaccount.SaveAccountID = clientid
 
-#def setAccount(session):
 
-#def delAccount(session):
+def addCheckAccount(session, accountid, clientid, bank, balance, date, overdraft):
+    if (len(session.query(AccountClass).filter(AccountClass.AccountID == accountid).all()) == 0):
+        account = AccountClass(AcountID=accountid, Balance=balance, DateOpening=date)
+        session.add(account)
+    else:
+        raise Exception("Account Id Exists")
+    openaccount=session.query(OpenAccountClass).filter(OpenAccountClass.BankName == bank,
+                                           OpenAccountClass.ClientID == clientid).first()
+    if(len(openaccount) == 0):
+        openaccount = OpenAccountClass(BankName=bank, ClientID=clientid)
+        session.add(openaccount)
+    if (len(session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).all()) == 0):
+        account = CheckAccountClass(AcountID=accountid, BankName=bank, ClientID=clientid,
+                               Balance=balance, DateOpening=date, Overdraft=overdraft)
+        session.add(account)
+    else:
+        raise Exception("Account Id Exists")
+    openaccount.CheckAccountID = clientid
 
-#def getLoan(session):
 
-#def setLoan(session):
 
-#def addLoan(session):
+def setAccount(session, accountid, new, attribute):
+    account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
+    if(attribute in ['Balance','DateOpening']):
+        account.__setattr__(attribute, new)
+    if (len(account.CheckofAccount) != 0):
+        checkaccount = session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).first()
+        checkaccount.__setattr__(attribute, new)
+    if (len(account.SaveofAccount) != 0):
+        saveaccount = session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).first()
+        saveaccount.__setattr__(attribute, new)
 
-#def delLoan(session):
 
-#def addPay(session):
+def delAccount(session, accountid):
+    account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
+    if (len(account.SaveofAccount) != 0):
+        session.delete(account.SaveofAccount[0].OpenofSave)
+        session.delete(account.SaveofAccount[0])
+    if (len(account.CheckofAccount) != 0):
+        session.delete(account.CheckofAccount[0].OpenofSCheck)
+        session.delete(account.CheckofAccount[0])
+    session.delete(account)
+
+
+def getLoan(session, clientid='', clientname='', bank=''):
+    loanList=[]
+    namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%' + clientname + '%')).all()
+    for loan in session.query(OwningClass,LoanClass) \
+            .filter(OwningClass.ClientID.like('%' + clientid + '%'),
+                    OwningClass.ClientID.in_(namelist),
+                    OwningClass.loanid.BankName.like('%' + bank + '%')) \
+            .order_by(OwningClass.ClientID):
+        sum = 0
+        state = '未发放'
+        for pay in loan.PayofLoan:
+            sum = sum + pay.Amount
+        if(sum == loan.loanid.Amount):
+            state = '已全部发放'
+        elif (sum > 0):
+            state = '发放中'
+        loanList.append([loan.LoanID, loan.ClientID, loan.loanid.BankName, loan.loanid.Amount, state])
+    return loanList
+
+
+def getPay(session, loanid):
+    payList = []
+    for pay in session.query(PayLoanClass)\
+            .filter(PayLoanClass.LoanID.like('%'+loanid+'%'))\
+            .order_by(PayLoanClass.Date):
+        payList.append([pay.PayID, pay.Date, pay.Amount])
+    return payList
+
+
+def addLoan(session, loanid, clientidlist, bank, amount):
+    loan = LoanClass(LoanID=loanid, BankName=bank, Amount=amount)
+    session.add(loan)
+    for owner in clientidlist:
+        own = OwningClass(ClientID=owner, LoanID=loanid)
+        session.add(own)
+
+
+def delLoan(session, loanid):
+    loan = session.query(LoanClass).filter(LoanClass.LoanID == loanid).first()
+    sum = 0
+    for pay in loan.PayofLoan:
+        sum = sum + pay.Amount
+    if (sum < loan.loanid.Amount):
+        raise Exception("未发放完成")
+    else:
+        session.delete(loan.OwnodLoan)
+        session.delete(loan.PayofLoan)
+        session.delete(loan)
+
+
+def addPay(session, payid, loanid, date, amount):
+    pay = PayLoanClass(PayID=payid, LoanID=loanid, Date=date, Amount=amount)
+    session.add(pay)
+
 
 #def calculate(session):
 
