@@ -19,6 +19,14 @@ def bank(page=None):
             ['bb', 'bbb', '1000'],
             ['cc', 'ccc', '10000'],
             ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
+            ['aa', 'aaa', '100'],
             ['bb', 'bbb', '1000'],
             ['cc', 'ccc', '10000'],
             ['aa', 'aaa', '100'],
@@ -113,13 +121,13 @@ def editbank(pk):
         bankcity = request.form['bankcity']
         property = request.form['property']
         print([pk, bankcity, property])
+        return render_template("success.html", action="修改", succ=1, showurl=url_for("bank.bank", page=0), messege=None)
     return render_template("edit.html", type=2)
 
 
 @bp.route("/delbank<string:pk>", methods=('GET', 'POST'))
 def delbank(pk):
-
-    return render_template("del.html", type=2, succ=1)
+    return render_template("success.html", action="删除", succ=1, showurl=url_for("bank.bank", page=0), messege=None)
 
 
 @bp.route("/", methods=("GET", "POST"))
