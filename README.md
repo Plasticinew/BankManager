@@ -3,8 +3,8 @@
 ### 接口
 * Bank接口类
     ```python
-    #获取按名称排序的支行信息，返回一个二维list
-    getBankOrderByName(
+    #获取支行信息，返回一个二维list
+    getBank(
         #支行名，默认为空
         name='',
         #城市，默认为空
@@ -14,23 +14,10 @@
         #最高资产，默认为100000000
         propertyhigh=1000000000,
         #默认从小到大排序
-        smallfirst=True)
-
-    #获取按城市排序的支行信息，返回一个二维list
-    getBankOrderByCity(
-        name='',
-        city='',
-        propertylow=0,
-        propertyhigh=1000000000,
-        smallfirst=True)
-
-    #获取按资产排序的支行信息，返回一个二维list
-    getBankOrderByProperty(
-        name='',
-        city='',
-        propertylow=0,
-        propertyhigh=1000000000,
-        smallfirst=True)
+        smallfirst=True,
+        #默认按BankName属性排序
+        orderby='BankName'    
+    )
 
     #增加一个新的支行，参数不能为空
     newBank(name, city, property)
@@ -64,13 +51,9 @@
     #银行资产修改
     bank.changeBankProperty('济南支行', -514)
     #获取列表函数可选参数name、city、propertylow（下界）和propertyhigh（上界）
-    print(bank.getBankOrderByCity(city='济南',propertylow=1000, propertyhigh=1000000))
+    print(bank.getBank(city='济南',propertylow=1000, propertyhigh=1000000, orderby='City'))
     #根据name（primary key）删除支行
     bank.delBank('济南支行')
-    print(bank.getBankOrderByName())
+    print(bank.getBank())
     ```
 
-### 已知问题
-* mysql-connector:No localization support for language 'eng'
-    
-    会报错但不影响程序正确执行
