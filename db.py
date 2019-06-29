@@ -5,7 +5,7 @@ from flask.cli import with_appcontext
 
 import os
 import sys
-from sqlalchemy import Column, CHAR, INT, DATE, ForeignKey
+from sqlalchemy import Column, CHAR, INT, DATE, ForeignKey, FLOAT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
@@ -40,6 +40,31 @@ class StaffClass(Base):
     Address = Column(CHAR(255), nullable=False)
     DateStartWorking = Column(DATE, nullable=False)
     bankname = relationship('BankClass',backref='StaffofBank')
+
+class ClientClass(Base):
+    __tablename__ = 'Client'
+
+    ClientID = Column(CHAR(18), primary_key=True, nullable=False)
+    LinkID = Column(CHAR(18))
+    LinkName = Column(CHAR(16))
+    ClientName = Column(CHAR(18), nullable=False)
+    Phone = Column(CHAR(14), nullable=False)
+    Address = Column(CHAR(255), nullable=False)
+
+class AccountClass(Base):
+    __tablename__ = 'Account'
+
+    AccountID = Column(CHAR(11), primary_key=True, nullable=True)
+    Balance = Column(FLOAT, nullable=True)
+    DateOpening = Column(DATE, nullable=True)
+
+class PersonInChargeClass(Base):
+    __tablename__ = 'PersonInCharge'
+
+    ClientID = Column(CHAR(18), ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+    StaffID = Column(CHAR(18), ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
+
+
 
 from contextlib import contextmanager
 

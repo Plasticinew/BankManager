@@ -3,40 +3,8 @@ from sqlalchemy import Column, CHAR, FLOAT, DATE
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from BankManager.db import BankClass, StaffClass
-
-
-
-class ClientClass(Base):
-    __tablename__ = 'Client'
-
-    ClientID = db.Column(db.CHAR(18), primary_key=True, nullable=False)
-    LinkID = db.Column(db.CHAR(18))
-    LinkName = db.Column(db.CHAR(16))
-    ClientName = db.Column(db.CHAR(18), nullable=False)
-    Phone = db.Column(db.CHAR(14), nullable=False)
-    Address = db.Column(db.CHAR(255), nullable=False)
-
-
-class AccountClass(Base):
-    __tablename__ = 'Account'
-
-    AccountID = Column(CHAR(11), nullable=True)
-    Balance = Column(FLOAT, nullable=True)
-    DateOpening = Column(DATE, nullable=True)
-
-
-
-
-
-class PersonInChargeClass(Base):
-    __tablename__ = 'PersonInCharge'
-
-    ClientID = db.Column(db.CHAR(18), db.ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
-    StaffID = db.Column(db.CHAR(18), db.ForeignKey('Staff.StaffID'), primary_key=True, nullable=False)
-
-
-
+from BankManager.db import BankClass, StaffClass, \
+    ClientClass, AccountClass, PersonInChargeClass
 
 def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
     bankList=[]
