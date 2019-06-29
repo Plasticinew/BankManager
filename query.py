@@ -94,14 +94,14 @@ def delStaff(session, id):
         raise Exception("ForeignKey constraint.")
 
 
-def getClient(session, id='', name='', phone='', address= '', smallfirst=True, orderby='ClientID'):
+def getClient(session, id='', name='', phone='', address= '', orderby='ClientID'):
     clientList=[]
     for client in session.query(ClientClass)\
             .filter(ClientClass.ClientID.like('%'+id+'%'),
                     ClientClass.ClientName.like('%'+name+'%'),
                     ClientClass.Phone.like('%'+phone+'%'),
                     ClientClass.Address.like('%'+address+'%'))\
-            .order_by((1 if smallfirst else -1)*ClientClass.__getattribute__(ClientClass, orderby)):
+            .order_by(ClientClass.__getattribute__(ClientClass, orderby)):
         linkname=''
         for i in client.LinkofClient:
             linkname=linkname+i.LinkName
@@ -302,8 +302,11 @@ if __name__ == '__main__':
     # Session.commit()
     # newSaveAccount(Session, '33333', '4396', '合肥支行', 77778, '2009-01-20', 6666, 'RMB')
     # Session.commit()
-    #newStaff(Session, 'ba', '合肥支行', 'ab', '4321', '合肥', '2000-12-11')
-    #newStaff(Session, 'ab', '合肥支行', 'ba', '1234', '合肥', '1999-12-11')
-    #Session.commit()
-    print(getStaff(session=Session, orderby='StaffID'))
-    print(getStaff(session=Session, orderby='StaffName'))
+    # newStaff(Session, 'ba', '合肥支行', 'ab', '4321', '合肥', '2000-12-11')
+    # newStaff(Session, 'ab', '合肥支行', 'ba', '1234', '合肥', '1999-12-11')
+    # Session.commit()
+    # print(getStaff(session=Session, orderby='StaffID'))
+    # print(getStaff(session=Session, orderby='StaffName'))
+    newLoan(session=Session, loanid='12345',clientidlist=['4396','1234'],bank='合肥支行',amount=114514)
+    addPay(session=Session, payid='123',loanid='12345',date='1999-12-21',amount=1234)
+    Session.commit()
