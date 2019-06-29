@@ -11,7 +11,7 @@ from flask import url_for
 from werkzeug.security import check_password_hash
 
 
-from BankManager.db import session_scope(), UserClass
+from BankManager.db import session_scope, UserClass
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -42,8 +42,6 @@ def load_logged_in_user():
             g.user = db_session.query(UserClass) \
                 .filter(UserClass.username == user_id).first()
 
-
-
 @bp.route("/login", methods=("GET", "POST"))
 def login():
     """Log in a registered user by adding the user id to the session."""
@@ -54,23 +52,26 @@ def login():
 
         with session_scope() as db_session:
             user = db_session.query(UserClass) \
-                .filter(UserClass.username == user_id).first()
+                .filter(UserClass.username.like(username)).first()
+            true_username = user.username
+            true_password = user.password
+        print(true_username)
+        print(true_password)
 
         if user is None:
             error = "Incorrect username."
-        elif not check_password_hash(user["password"], password):
+        elif not check_password_hash(true_password, password):
             error = "Incorrect password."
 
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
-            session["user_id"] = user["username"]
+            session["user_id"] = true_username
             return redirect(url_for("index"))
-
+        print("error")
         flash(error)
 
     return render_template("login.html")
-
 
 @bp.route("/logout")
 def logout():

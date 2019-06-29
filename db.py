@@ -46,13 +46,9 @@ class ClientClass(Base):
     __tablename__ = 'Client'
 
     ClientID = Column(CHAR(18), primary_key=True, nullable=False)
-    LinkID = Column(CHAR(18), ForeignKey('LinkMan.ClientID'))
-    LinkName = Column(CHAR(16), ForeignKey('LinkMan.LinkName'))
     ClientName = Column(CHAR(18), nullable=False)
     Phone = Column(CHAR(14), nullable=False)
     Address = Column(CHAR(255), nullable=False)
-    linkid = relationship('LinkManClass', backref='ClientIDofLink', foreign_keys=[LinkID])
-    linkname = relationship('LinkManClass', backref='ClientNameofLink', foreign_keys=[LinkName])
 
 
 class AccountClass(Base):
@@ -67,28 +63,19 @@ class CheckAccountClass(Base):
     __tablename__ = 'CheckAccount'
 
     AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
-    BankName = Column(CHAR(255), ForeignKey('OpenAccount.BankName'))
-    ClientID = Column(CHAR(18), ForeignKey('OpenAccount.ClientID'))
     Balance = Column(FLOAT, nullable=True)
     DateOpening = Column(DATE, nullable=True)
     Overdraft = Column(FLOAT)
     accountid = relationship('AccountClass', backref='CheckofAccount', foreign_keys=[AccountID])
-    bankname = relationship('OpenAccountClass', backref='CheckBankofOpen', foreign_keys=[BankName])
-    clientid = relationship('OpenAccountClass', backref='CheckIDofOpen', foreign_keys=[ClientID])
-
 
 class SaveAccountClass(Base):
     __tablename__ = 'SaveAccount'
 
     AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
-    BankName = Column(CHAR(255), ForeignKey('OpenAccount.BankName'))
-    ClientID = Column(CHAR(18), ForeignKey('OpenAccount.ClientID'))
     Balance = Column(FLOAT, nullable=True)
     DateOpening = Column(DATE, nullable=True)
     Rate = Column(FLOAT)
     accountid = relationship('AccountClass', backref='SaveofAccount', foreign_keys=[AccountID])
-    bankname = relationship('OpenAccountClass', backref='SaveBankofOpen', foreign_keys=[BankName])
-    clientid = relationship('OpenAccountClass', backref='SaveIDofOpen', foreign_keys=[ClientID])
 
 
 class OwningClass(Base):
@@ -126,7 +113,7 @@ class PayLoanClass(Base):
     PayID = Column(CHAR(18), primary_key=True)
     LoanID = Column(CHAR(18), ForeignKey('Loan.LoanID'), primary_key=True)
     Date = Column(DATE)
-    Amount = Column(CHAR(FLOAT))
+    Amount = Column(FLOAT, nullable=False)
     loanid = relationship('LoanClass', backref='PayofLoan')
 
 
@@ -153,6 +140,7 @@ class PersonInChargeClass(Base):
 
 class UserClass(Base):
     __tablename__ = 'user'
+
     username = Column(CHAR(255), primary_key=True)
     password = Column(CHAR(255), nullable=False)
     # permissions from 0 to 3
@@ -176,15 +164,17 @@ def session_scope():
 def init_db():
     """Clear existing data and create new tables."""
     db = engine.connect()
-    tables = list(reversed(Base.metadata.sorted_tables))
-    for table in tables:
-        table.drop(engine)
+    Base.metadata.drop_all(engine, checkfirst=True)
+    # tables = list(reversed(Base.metadata.sorted_tables))
+    # tables = Base.metadata.sorted_tables
+    # for table in tables:
+    #     table.drop(engine, checkfirst=True)
     Base.metadata.create_all(engine)
 
     # add admin user
     with session_scope() as db_session:
         db_session.add(UserClass(\
-            username=admin, password=generate_password_hash('mayuxin1999'), permissions=3))
+            username="admin", password=generate_password_hash('mayuxin1999'), permissions=3))
 
 
 @click.command("init-db")

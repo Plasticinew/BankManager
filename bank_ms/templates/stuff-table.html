@@ -7,12 +7,12 @@
     <div class="am-u-sm-12 am-u-md-4">
         <div class="am-btn-toolbar">
             <div class="am-btn-group am-btn-group-xs">
-                <a href="{{url_for('bank.addbank')}}">
+                <a href="{{url_for('bank.addstuff')}}">
                     <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
                         新增
                     </button>
                 </a>
-                <a href="{{url_for('bank.success',p='bank')}}">
+                <a href="{{url_for('bank.success',p='stuff')}}">
                     <button type="button" class="am-btn am-btn-default"><span class="am-icon-save"></span>
                         保存
                     </button>
@@ -22,19 +22,24 @@
     </div>
     <div class="am-u-sm-12 am-u-md-8">
         <form method="post">
-            <label for="name">名称</label>
-            <input name="name" id="name" size="6">
-            <label for="city">城市</label>
-            <input name="city" id="city" size="6">
-            <label for="minp">资产范围</label>
-            <input name="minp" id="minp" size="4">
-            <label for="maxp">-</label>
-            <input name="maxp" id="maxp" size="4">
+            <label for="stuffid">员工ID</label>
+            <input name="stuffid" id="stuffid" size="6">
+            <label for="bankname">所在支行</label>
+            <input name="bankname" id="bankname" size="6">
+            <label for="stuffname">员工姓名</label>
+            <input name="stuffname" id="stuffname" size="5">
+            <label for="phone">手机号</label>
+            <input name="phone" id="phone" size="8">
+            <br>
+            <label for="mindate">开始工作时间范围</label>
+            <input name="mindate"  type="date" id="mindate" size="4">
+            <label for="maxdate">-</label>
+            <input name="maxdate"  type="date" id="maxdate" size="4">
             <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
                 <option value="option0">--排序方式--</option>
-                <option value="option1">余额</option>
-                <option value="option2">名称</option>
-                <option value="option3">城市</option>
+                <option value="option1">ID</option>
+                <option value="option2">员工姓名</option>
+                <option value="option3">所在支行</option>
             </select>
             <input type="submit" value="查询">
         </form>
@@ -48,9 +53,12 @@
                 <tr>
                     <th></th>
                     <th class="table-id">序号</th>
-                    <th class="table-title" width="40%">名称</th>
-                    <th class="table-type">城市</th>
-                    <th class="table-author">资产</th>
+                    <th class="table-title" width="10%">员工id</th>
+                    <th class="table-title" width="12%">所在支行</th>
+                    <th class="table-title" width="10%">员工姓名</th>
+                    <th class="table-title" width="15%">员工手机号</th>
+                    <th class="table-title" width="15%">员工地址</th>
+                    <th class="table-title" width="10%">开始工作日期</th>
                     <th class="table-set">操作</th>
                 </tr>
                 </thead>
@@ -61,16 +69,20 @@
                     <td>{{loop.index+page*10}}</td>
                     <td>{{dbank[0]}}</td>
                     <td>{{dbank[1]}}</td>
+                    <td>{{dbank[2]}}</td>
+                    <td>{{dbank[3]}}</td>
+                    <td>{{dbank[4]}}</td>
+                    <td>{{dbank[5]}}</td>
                     <td class="am-hide-sm-only">{{dbank[2]}}</td>
                     <td>
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
-                                <a href="{{url_for('bank.editbank',pk = dbank[0])}}"
+                                <a href="{{url_for('bank.editstuff',pk = dbank[0])}}"
                                    class="am-btn am-btn-xs am-text-secondary"><span
                                         class="am-icon-pencil-square-o"></span> 编辑
 
                                 </a>
-                                <a href="{{url_for('bank.delbank',pk = dbank[0])}}"
+                                <a href="{{url_for('bank.delstuff',pk = dbank[0])}}"
                                    class="am-btn am-btn-xs am-text-danger">
                                     <span class="am-icon-trash-o"></span> 删除
 
@@ -84,7 +96,7 @@
                 </tbody>
             </table>
             <div class="am-cf">
-                共{{tot}}条记录，当前显示{% if tot==0 %}{{tot}}{%else%}{{page*10+1}}{%endif%}到{% if page*10+10>tot %}{{tot}}{%else%}{{page*10+10}}{%endif%}条
+                共{{tot}}条记录，当前显示{{page*10+1}}到{% if page*10+10>tot %}{{tot}}{%else%}{{page*10+10}}{%endif%}条
                 <div class="am-fr">
                     <ul class="am-pagination">
                         <li {% if page==0 %} class="am-disabled" {% endif %}><a
@@ -98,7 +110,7 @@
                         <li><a href="#">...</a></li>
                         {%endif%}
 
-                        {%if tot//10+1 <min+5 %}
+                        {%if tot//10+1<min+5 %}
                                 {%set max=tot//10+1%}
                                 {%else%}
                                 {%set max=min+5%}
