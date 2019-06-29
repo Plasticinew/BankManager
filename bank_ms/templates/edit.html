@@ -50,7 +50,7 @@
             <ul class="am-list admin-sidebar-list">
                 <li><a href="{{url_for('bank.index')}}"><span class="am-icon-home"></span> 首页</a></li>
                 <li><a href="{{url_for('bank.bank',page = 0)}}"><span class="am-icon-table"></span> 支行管理</a></li>
-                <li><a href="{{url_for('bank.addbank')}}"><span class="am-icon-pencil-square-o"></span> 新建表项</a></li>
+                <li><a href="{{url_for('bank.addbank')}}"><span class="am-icon-pencil-square-o"></span> 账户管理</a></li>
                 <li><a href="{{url_for('bank.login')}}"><span class="am-icon-sign-out"></span> 注销</a></li>
             </ul>
 
@@ -225,7 +225,14 @@
                     {%if type==2 %}
                     <div class="am-tab-panel am-active">
                         <form class="am-form" method="post">
-
+                            <div class="am-g am-margin-top-sm">
+                                <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                                    <label for="bankname">支行名称</label>
+                                </div>
+                                <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                                    <input type="text" class="am-input-sm" name="bankname" id="bankname">
+                                </div>
+                            </div>
                             <div class="am-g am-margin-top-sm">
                                 <div class="am-u-sm-4 am-u-md-2 am-text-right">
                                     <label for="bankcity">所在城市</label>
