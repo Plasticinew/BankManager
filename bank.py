@@ -25,6 +25,8 @@ def index(page=None):
 
 @bp.route("/bank<int:page>", methods=('GET', 'POST'))
 def bank(page=None):
+    global cont
+
     if not page:
         page = 0
     if request.method == 'POST':
@@ -32,19 +34,15 @@ def bank(page=None):
         city = request.form['city']
         waytosort = request.form['way']
         if waytosort == 'option0':
-            global cont
             cont = []
         if waytosort == 'option1':
             with session_scope() as session:
-                global cont
                 cont = getBank(session, name=name, city=city, orderby='Property')
         if waytosort == 'option2':
             with session_scope() as session:
-                global cont
                 cont = getBank(session, name=name, city=city)
         if waytosort == 'option3':
             with session_scope() as session:
-                global cont
                 cont = getBank(session, name=name, city=city, orderby='City')
     return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 

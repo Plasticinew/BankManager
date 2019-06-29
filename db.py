@@ -178,7 +178,7 @@ def init_db():
     db = engine.connect()
     tables = list(reversed(Base.metadata.sorted_tables))
     for table in tables:
-        table.drop(engine)
+        table.drop(engine, checkfirst=True)
     Base.metadata.create_all(engine)
 
     # add admin user
