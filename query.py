@@ -102,8 +102,11 @@ if __name__ == '__main__':
     DBSession = sessionmaker(bind=engine)
     bank = Bank(DBSession())
     #添加支行信息
-    bank.newBank('下北泽支行', '下北泽', 43962800)
-    bank.newBank('合肥支行', '合肥', 1919810)
+    try:
+        bank.newBank('下北泽支行', '下北泽', 43962800)
+        bank.newBank('合肥支行', '合肥', 1919810)
+    except Exception as e:
+        print(e)
     bank.newBank('济南支行', '济南', 114514)
     #获取按资产顺序排序的银行列表
     print(bank.getBank(orderby='Property'))
