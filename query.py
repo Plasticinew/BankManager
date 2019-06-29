@@ -29,32 +29,14 @@ class StaffClass(Base):
 
 class Bank:
     "支行管理的接口类，提供了三种排序方式的获取和筛选接口，以及增改删接口"
-    def __init__(self,name,key):
-        engine = db.create_engine('mysql+mysqlconnector://root:'+key+'@localhost:3306/'+name)
-        DBSession = sessionmaker(bind=engine)
-        self.session = DBSession()
+    def __init__(self, session):
+        self.session = session
 
-    def getBankOrderByName(self, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True):
+    def getBank(self, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
         bankList=[]
         for bank in self.session.query(BankClass) \
-                .filter(BankClass.BankName.like('%'+name+'%'), BankClass.City.like('%'+city+'%'), BankClass.Property>propertylow, BankClass.Property<propertyhigh)\
-                .order_by((1 if smallfirst else -1)*BankClass.BankName):
-            bankList.append([bank.BankName, bank.City, bank.Property])
-        return bankList
-
-    def getBankOrderByCity(self, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True):
-        bankList=[]
-        for bank in self.session.query(BankClass)\
-                .filter(BankClass.BankName.like('%'+name+'%'), BankClass.City.like('%'+city+'%'), BankClass.Property>propertylow, BankClass.Property<propertyhigh)\
-                .order_by((1 if smallfirst else -1)*BankClass.City):
-            bankList.append([bank.BankName, bank.City, bank.Property])
-        return bankList
-
-    def getBankOrderByProperty(self, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True):
-        bankList = []
-        for bank in self.session.query(BankClass)\
-                .filter(BankClass.BankName.like('%'+name+'%'), BankClass.City.like('%'+city+'%'), BankClass.Property>propertylow, BankClass.Property<propertyhigh)\
-                .order_by((1 if smallfirst else -1)*BankClass.Property):
+                .filter(BankClass.BankName.like('%'+name+'%'), BankClass.City.like('%'+city+'%'), BankClass.Property > propertylow, BankClass.Property < propertyhigh)\
+                .order_by((1 if smallfirst else -1)*BankClass.__getattribute__(BankClass, orderby)):
             bankList.append([bank.BankName, bank.City, bank.Property])
         return bankList
 
@@ -90,13 +72,22 @@ class Bank:
             self.session.delete(self.session.query(BankClass).filter(BankClass.BankName == name).first())
         self.session.commit()
 
-    def __del__(self):
-        self.session.close()
+'''
+class Staff:
+    def __init__(self, session):
+        self.session = session
+
+    def getStaffbyID(self, id = '', ):
+        
+'''
+
 
 
 if __name__ == '__main__':
     #bank类的接口示例
-    bank = Bank('test','2161815')
+    engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
+    DBSession = sessionmaker(bind=engine)
+    bank = Bank(DBSession())
     #添加支行信息
     bank.newBank('下北泽支行', '下北泽', 43962800)
     bank.newBank('合肥支行', '合肥', 1919810)
