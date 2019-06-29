@@ -11,10 +11,10 @@ from werkzeug.exceptions import abort
 bp = Blueprint("bank", __name__)
 
 
-@bp.route("/", methods=('GET', 'POST'))
-def index():
-    page = 0
-    cont = []
+@bp.route("/bank<int:page>", methods=('GET', 'POST'))
+def bank(page=None):
+    if not page:
+        page = 0
     cont = [['aa', 'aaa', '100'],
             ['bb', 'bbb', '1000'],
             ['cc', 'ccc', '10000'],
@@ -33,30 +33,20 @@ def index():
         waytosort = request.form['way']
         cont = [[name, city, waytosort]]
 
-    return render_template("admin-table.html", page=page, cont=cont[page*10: min(page*10+10, len(cont))], tot=len(cont))
+    return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 
 
-@bp.route("/table<int:page>", methods=("GET", "POST"))
-def table(page):
-    cont = []
-    cont = [['aa', 'aaa', '100'],
-            ['bb', 'bbb', '1000'],
-            ['cc', 'ccc', '10000'],
-            ['aa', 'aaa', '100'],
-            ['bb', 'bbb', '1000'],
-            ['cc', 'ccc', '10000'],
-            ['aa', 'aaa', '100'],
-            ['bb', 'bbb', '1000'],
-            ['cc', 'ccc', '10000'],
-            ['aa', 'aaa', '100'],
-            ['bb', 'bbb', '1000'],
-            ['cc', 'ccc', '10000']]
+@bp.route("/addbank", methods=('GET', 'POST'))
+def addbank():
     if request.method == 'POST':
-        name = request.form['name']
-        city = request.form['city']
-        waytosort = request.form['way']
-        cont = [[name, city, waytosort]]
+        bankname = request.form['bankname']
+        bankcity = request.form['bankcity']
+        property = request.form['property']
+        print([bankname, bankcity, property])
+    return render_template("add.html", type=0)
 
-    return render_template("admin-table.html", page=page, cont=cont[page*10: min(page*10+10, len(cont))], tot=len(cont))
+@bp.route("/", methods=("GET", "POST"))
+def index(page=None):
+    return redirect(url_for("bank.bank", page=0))
 
 
