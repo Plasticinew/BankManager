@@ -10,9 +10,7 @@ from BankManager.db import session_scope
 
 from BankManager.auth import login_required
 
-# from BankManager.auth import login_required
-
-from BankManager.query import getBank, newBank, setBank
+from BankManager.query import getBank, newBank, setBank, delBank
 
 with session_scope() as session:
     global cont
@@ -62,15 +60,12 @@ def addbank():
         error = None
         print([bankname, city, property])
         if bankname == '':
-            print("null bankname")
             error = "Bank Name is required."
 
         if city == '':
-            print("null city")
             error = "City is required."
 
         if property == '':
-            print("null property")
             error = "Property is required."
 
         if error is not None:
@@ -83,6 +78,8 @@ def addbank():
             with session_scope() as session:
                 global cont
                 cont = getBank(session)
+            return render_template("success.html", action="增加", \
+                                   succ=1, showurl=url_for("bank.bank", page=0), messege=None)
     return render_template("add.html", type=2)
 
 @bp.route("/editbank<string:pk>", methods=('GET', 'POST'))
@@ -109,6 +106,8 @@ def editbank(pk):
         with session_scope() as session:
             global cont
             cont = getBank(session)
+        return render_template("success.html", action="编辑", \
+                               succ=1, showurl=url_for("bank.bank", page=0), messege=None)
 
     return render_template("edit.html", type=2)
 
@@ -116,5 +115,10 @@ def editbank(pk):
 @login_required
 def delbank(pk):
     with session_scope() as session:
-        delbank(session, pk)
+        delBank(session, pk)
     return render_template("del.html", type=2, succ=1)
+
+@bp.route("/success<string:p>", methods=('GET', 'POST'))
+def success(p):
+    return render_template("success.html", action="保存", \
+                           succ=1, showurl=url_for(p + '.' + p, page=0), messege=None)
