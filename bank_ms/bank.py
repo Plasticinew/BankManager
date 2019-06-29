@@ -195,7 +195,7 @@ def delbank(pk):
 
 @bp.route("/success<string:p>", methods=('GET', 'POST'))
 def success(p):
-    return render_template("success.html", action="保存", succ=1, showurl=url_for("bank."+p, page=0), messege=None)
+    return render_template("success.html", action="保存", succ=1, showurl=url_for(p + '.' + p, page=0), messege=None)
 
 
 @bp.route("/", methods=("GET", "POST"))
