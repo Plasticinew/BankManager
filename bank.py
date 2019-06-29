@@ -31,10 +31,21 @@ def bank(page=None):
         name = request.form['name']
         city = request.form['city']
         waytosort = request.form['way']
+        if waytosort == 'option0':
+            global cont
+            cont = []
+        if waytosort == 'option1':
+            with session_scope() as session:
+                global cont
+                cont = getBank(session, name=name, city=city, orderby='Property')
         if waytosort == 'option2':
             with session_scope() as session:
                 global cont
                 cont = getBank(session, name=name, city=city)
+        if waytosort == 'option3':
+            with session_scope() as session:
+                global cont
+                cont = getBank(session, name=name, city=city, orderby='City')
     return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 
 @bp.route("/addbank", methods=('GET', 'POST'))
@@ -65,6 +76,10 @@ def addbank():
         else:
             with session_scope() as session:
                 newBank(session, bankname, city, int(property))
+
+            with session_scope() as session:
+                global cont
+                cont = getBank(session)
     return render_template("add.html", type=2)
 
 @bp.route("/editbank<string:pk>", methods=('GET', 'POST'))
@@ -95,8 +110,6 @@ def editbank(pk):
 
 @bp.route("/delbank<string:pk>", methods=('GET', 'POST'))
 def delbank(pk):
-
+    with session_scope() as session:
+        delbank(session, pk)
     return render_template("del.html", type=2, succ=1)
-@bp.route("/login", methods=("GET", "POST"))
-def login():
-    return render_template("login.html")

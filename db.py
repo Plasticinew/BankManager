@@ -11,6 +11,8 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy import text
 
+from werkzeug.security import generate_password_hash
+
 engine = create_engine( \
     'mysql+mysqlconnector://root:mayuxin1999@localhost:3306/bankdbms')
 DBSession = sessionmaker(bind=engine)
@@ -149,7 +151,12 @@ class PersonInChargeClass(Base):
     clientid = relationship('ClientClass', backref='ChargeofClient', foreign_keys=[ClientID])
     staffid = relationship('StaffClass', backref='ChargeofStaff', foreign_keys=[StaffID])
 
-
+class UserClass(Base):
+    __tablename__ = 'user'
+    username = Column(CHAR(255), primary_key=True)
+    password = Column(CHAR(255), nullable=False)
+    # permissions from 0 to 3
+    permissions = Column(INT, nullable=False)
 
 from contextlib import contextmanager
 
@@ -173,6 +180,11 @@ def init_db():
     for table in tables:
         table.drop(engine)
     Base.metadata.create_all(engine)
+
+    # add admin user
+    with session_scope() as db_session:
+        db_session.add(UserClass(\
+            username=admin, password=generate_password_hash('mayuxin1999'), permissions=3))
 
 
 @click.command("init-db")
