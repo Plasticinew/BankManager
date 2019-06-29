@@ -54,17 +54,17 @@ class ClientClass(Base):
 class AccountClass(Base):
     __tablename__ = 'Account'
 
-    AccountID = Column(CHAR(11), primary_key=True, nullable=True)
-    Balance = Column(FLOAT, nullable=True)
-    DateOpening = Column(DATE, nullable=True)
+    AccountID = Column(CHAR(11), primary_key=True, nullable=False)
+    Balance = Column(FLOAT, nullable=False)
+    DateOpening = Column(DATE, nullable=False)
 
 
 class CheckAccountClass(Base):
     __tablename__ = 'CheckAccount'
 
     AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
-    Balance = Column(FLOAT, nullable=True)
-    DateOpening = Column(DATE, nullable=True)
+    Balance = Column(FLOAT, nullable=False)
+    DateOpening = Column(DATE, nullable=False)
     Overdraft = Column(FLOAT)
     accountid = relationship('AccountClass', backref='CheckofAccount', foreign_keys=[AccountID])
 
@@ -72,9 +72,10 @@ class SaveAccountClass(Base):
     __tablename__ = 'SaveAccount'
 
     AccountID = Column(CHAR(11), ForeignKey('Account.AccountID'), primary_key=True, nullable=True)
-    Balance = Column(FLOAT, nullable=True)
-    DateOpening = Column(DATE, nullable=True)
+    Balance = Column(FLOAT, nullable=False)
+    DateOpening = Column(DATE, nullable=False)
     Rate = Column(FLOAT)
+    MoneyType = Column(CHAR(18),nullable=False)
     accountid = relationship('AccountClass', backref='SaveofAccount', foreign_keys=[AccountID])
 
 
@@ -90,8 +91,8 @@ class OwningClass(Base):
 class LinkManClass(Base):
     __tablename__ = 'LinkMan'
 
-    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True, nullable=True)
-    LinkName = Column(CHAR(16), primary_key=True, nullable=True)
+    ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True, nullable=False)
+    LinkName = Column(CHAR(16), primary_key=True, nullable=False)
     Phone = Column(CHAR(14))
     Email = Column(CHAR(14))
     Association = Column(CHAR(128))
@@ -103,7 +104,7 @@ class LoanClass(Base):
 
     LoanID = Column(CHAR(18), primary_key=True)
     BankName = Column(CHAR(255), ForeignKey('Bank.BankName'))
-    Amount = Column(FLOAT, nullable=True)
+    Amount = Column(FLOAT, nullable=False)
     clientid = relationship('BankClass', backref='LoanofBank')
 
 
