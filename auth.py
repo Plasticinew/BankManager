@@ -13,7 +13,7 @@ from werkzeug.security import check_password_hash
 
 from BankManager.db import session_scope, UserClass
 
-bp = Blueprint("auth", __name__, url_prefix="/auth")
+bp = Blueprint("auth", __name__)
 
 
 def login_required(view):
