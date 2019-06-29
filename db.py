@@ -5,7 +5,7 @@ from flask.cli import with_appcontext
 
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Float
+from sqlalchemy import Column, CHAR, INT, DATE, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import create_engine
@@ -17,13 +17,12 @@ DBSession = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
-
-class Bank(Base):
+class BankClass(Base):
     __tablename__ = 'Bank'
 
-    BankName = Column(String(255), primary_key=True, nullable=False)
-    City = Column(String(255), nullable=False)
-    Property = Column(Integer, nullable=False)
+    BankName = Column(CHAR(255), primary_key=True, nullable=False)
+    City = Column(CHAR(255), nullable=False)
+    Property = Column(INT, nullable=False)
 
     # Workers = db.orm.relationship('银行员工')
 
@@ -31,25 +30,30 @@ class Bank(Base):
         return "<Bank(BankName = '%s', City = '%s', Property = '%d')" \
                % (self.BankName, self.City, self.Property)
 
-def get_dbSession():
-    """Connect to the application's configured database. The connection
-    is unique for each request and will be reused if this is called
-    again.
-    """
-    if "db" not in g:
-        g.db = DBSession()
+class StaffClass(Base):
+    __tablename__ = 'Staff'
 
-    return g.db
+    StaffID = Column(CHAR(18), primary_key=True, nullable=False)
+    BankName = Column(CHAR(255), ForeignKey('Bank.BankName'),nullable=False)
+    StaffName = Column(CHAR(18), nullable=False)
+    Phone = Column(CHAR(14), nullable=False)
+    Address = Column(CHAR(255), nullable=False)
+    DateStartWorking = Column(DATE, nullable=False)
+    bankname = relationship('BankClass',backref='StaffofBank')
 
+from contextlib import contextmanager
 
-def close_db(e=None):
-    """If this request connected to the database, close the
-    connection.
-    """
-    db = g.pop("db", None)
-
-    if db is not None:
-        db.close()
+@contextmanager
+def session_scope():
+    session = DBSession()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
 
 
 def init_db():
@@ -73,5 +77,5 @@ def init_app(app):
     """Register database functions with the Flask app. This is called by
     the application factory.
     """
-    app.teardown_appcontext(close_db)
+    # app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)

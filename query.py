@@ -2,29 +2,8 @@ import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+from BankManager.db import BankClass, StaffClass
 
-Base = declarative_base()
-
-
-class BankClass(Base):
-    __tablename__ = 'Bank'
-
-    BankName = db.Column(db.CHAR(255), primary_key=True, nullable=False)
-    City = db.Column(db.CHAR(255), nullable=False)
-    Property = db.Column(db.INT, nullable=False)
-    #Workers = db.orm.relationship('银行员工')
-
-
-class StaffClass(Base):
-    __tablename__ = 'Staff'
-
-    StaffID = db.Column(db.CHAR(18), primary_key=True, nullable=False)
-    BankName = db.Column(db.CHAR(255), db.ForeignKey('Bank.BankName'),nullable=False)
-    StaffName = db.Column(db.CHAR(18), nullable=False)
-    Phone = db.Column(db.CHAR(14), nullable=False)
-    Address = db.Column(db.CHAR(255), nullable=False)
-    DateStartWorking = db.Column(db.DATE, nullable=False)
-    bankname = db.orm.relationship('BankClass',backref='StaffofBank')
 
 def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
     bankList=[]

@@ -5,11 +5,10 @@ from flask import redirect
 from flask import url_for
 from flask import render_template
 
-from BankManager.db import get_dbSession
-# from BankManager.db import BankQuery
-from BankManager.db import Bank
-from BankManager.auth import login_required
+from BankManager.db import session_scope
+# from BankManager.auth import login_required
 
+from BankManager.query import getBank, newBank, setBank
 
 
 bp = Blueprint("bank", __name__)
@@ -23,34 +22,28 @@ def index(page=None):
 def bank(page=None):
     if not page:
         page = 0
-    cont = getBankOrderByName()
+    with session_scope() as session:
+        cont = getBank(session)
     if request.method == 'POST':
         name = request.form['name']
         city = request.form['city']
         waytosort = request.form['way']
         if waytosort == 'option2':
-            cont = getBankOrderByName(name, city)
+            with session_scope() as session:
+                cont = getBank(session, name=name, city=city)
 
     return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 
 @bp.route("/addbank", methods=('GET', 'POST'))
+# @login_required
 def addbank():
     if request.method == 'POST':
-        bankname = request.form['bankname']
-        bankcity = request.form['bankcity']
-        property = request.form['property']
-        print([bankname, bankcity, property])
-    return render_template("add.html", type=0)
-
-@bp.route("/create", methods=("GET", "POST"))
-@login_required
-def create():
-    if request.method == "POST":
-        bankname = request.form["BankName"]
-        city = request.form["City"]
-        property = request.form["Property"]
+        print("hello")
+        bankname = request.form["bankname"]
+        city = request.form["bankcity"]
+        property = request.form["property"]
         error = None
-
+        print([bankname, city, property])
         if not bankname:
             error = "Bank Name is required."
 
@@ -63,19 +56,6 @@ def create():
         if error is not None:
             flash(error)
         else:
-            DBSession = get_dbSession()
-            DBSession.add(Bank(\
-                BankName=bankname, City=city,\
-                Property=property))
-            DBSession.commit()
-            return redirect(url_for("bank.index"))
-
-def getBankOrderByName(name='', city='', ascending=True):
-    session = get_dbSession()
-    banklist = []
-    for bank in session.query(Bank)\
-        .filter(Bank.BankName.like('%' + name + '%'),\
-                Bank.City.like('%' + city + '%')):
-        # .order_by((1 if ascending else -1) * Bank.BankName):
-        banklist.append((bank.BankName, bank.City, bank.Property))
-    return banklist
+            with session_scope() as session:
+                newBank(session, bankname, city, int(property))
+    return render_template("add.html", type=0)
