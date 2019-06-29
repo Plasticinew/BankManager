@@ -4,8 +4,11 @@ from flask import flash
 from flask import redirect
 from flask import url_for
 from flask import render_template
+from flask import g
 
 from BankManager.db import session_scope
+
+from BankManager.auth import login_required
 
 # from BankManager.auth import login_required
 
@@ -20,13 +23,15 @@ bp = Blueprint("bank", __name__)
 page_length = 10
 
 @bp.route("/", methods=('GET', 'POST'))
+@login_required
 def index(page=None):
     return redirect(url_for("bank.bank", page=0))
+    # return render_template("login.html")
 
 @bp.route("/bank<int:page>", methods=('GET', 'POST'))
+@login_required
 def bank(page=None):
     global cont
-
     if not page:
         page = 0
     if request.method == 'POST':
@@ -47,7 +52,7 @@ def bank(page=None):
     return render_template("admin-table.html", page=page, cont=cont, tot=len(cont))
 
 @bp.route("/addbank", methods=('GET', 'POST'))
-# @login_required
+@login_required
 def addbank():
     if request.method == 'POST':
         print("hello")
@@ -81,6 +86,7 @@ def addbank():
     return render_template("add.html", type=2)
 
 @bp.route("/editbank<string:pk>", methods=('GET', 'POST'))
+@login_required
 def editbank(pk):
     if request.method == 'POST':
         city = request.form['bankcity']
@@ -107,6 +113,7 @@ def editbank(pk):
     return render_template("edit.html", type=2)
 
 @bp.route("/delbank<string:pk>", methods=('GET', 'POST'))
+@login_required
 def delbank(pk):
     with session_scope() as session:
         delbank(session, pk)

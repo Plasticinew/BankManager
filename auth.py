@@ -46,27 +46,27 @@ def load_logged_in_user():
 def login():
     """Log in a registered user by adding the user id to the session."""
     if request.method == "POST":
-        for key in request.form.keys():
-            print(key)
-        print("gg")
         username = request.form["username"]
         password = request.form["password"]
-        print(username, password)
         error = None
 
         with session_scope() as db_session:
             user = db_session.query(UserClass) \
-                .filter(UserClass.username == username).first()
+                .filter(UserClass.username.like(username)).first()
+            true_username = user.username
+            true_password = user.password
+        print(true_username)
+        print(true_password)
 
         if user is None:
             error = "Incorrect username."
-        elif not check_password_hash(user["password"], password):
+        elif not check_password_hash(true_password, password):
             error = "Incorrect password."
 
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
-            session["user_id"] = user["username"]
+            session["user_id"] = true_username
             return redirect(url_for("index"))
         print("error")
         flash(error)
