@@ -48,10 +48,10 @@
     <div class="admin-sidebar am-offcanvas" id="admin-offcanvas">
         <div class="am-offcanvas-bar admin-offcanvas-bar">
             <ul class="am-list admin-sidebar-list">
-                <li><a href="admin-index.html"><span class="am-icon-home"></span> 首页</a></li>
-                <li><a href="admin-table.html"><span class="am-icon-table"></span> 表格</a></li>
-                <li><a href="admin-form.html"><span class="am-icon-pencil-square-o"></span> 表单</a></li>
-                <li><a href="#"><span class="am-icon-sign-out"></span> 注销</a></li>
+                <li><a href="{{url_for('bank.index')}}"><span class="am-icon-home"></span> 首页</a></li>
+                <li><a href="{{url_for('bank.bank',page = 0)}}"><span class="am-icon-table"></span> 支行管理</a></li>
+                <li><a href="{{url_for('bank.addbank')}}"><span class="am-icon-pencil-square-o"></span> 新建表项</a></li>
+                <li><a href="{{url_for('bank.login')}}"><span class="am-icon-sign-out"></span> 注销</a></li>
             </ul>
 
 
@@ -73,13 +73,20 @@
 
             <div class="am-tabs am-margin" data-am-tabs>
                 <ul class="am-tabs-nav am-nav am-nav-tabs">
-                    <li {%if type==0 %}class="am-active" {%endif%}><a href="#tab1">新建账户</a></li>
-                    <li {%if type==1 %}class="am-active" {%endif%}><a href="#tab2">新建员工</a></li>
-                    <li {%if type==2 %}class="am-active" {%endif%}><a href="#tab3">新建支行</a></li>
+                    {%if type==0 %}
+                    <li class="am-active"><a href="#tab1">新建账户</a></li>
+                    {%endif%}
+                    {%if type==1 %}
+                    <li class="am-active"><a href="#tab2">新建员工</a></li>
+                    {%endif%}
+                    {%if type==2 %}
+                    <li class="am-active"><a href="#tab3">新建支行</a></li>
+                    {%endif%}
                 </ul>
 
                 <div class="am-tabs-bd">
-                    <div class="am-tab-panel am-fade am-in am-active" id="tab1">
+                    {%if type==0 %}
+                    <div class="am-tab-panel am-active">
                         <div class="am-g am-margin-top">
                             <div class="am-u-sm-4 am-u-md-2 am-text-right">所属类别</div>
                             <div class="am-u-sm-8 am-u-md-10">
@@ -160,8 +167,9 @@
                         </div>
 
                     </div>
-
-                    <div class="am-tab-panel am-fade" id="tab2">
+                    {%endif%}
+                    {%if type==1 %}
+                    <div class="am-tab-panel am-active">
                         <form class="am-form">
                             <div class="am-g am-margin-top">
                                 <div class="am-u-sm-4 am-u-md-2 am-text-right">
@@ -213,8 +221,9 @@
 
                         </form>
                     </div>
-
-                    <div class="am-tab-panel am-fade" id="tab3">
+                    {%endif%}
+                    {%if type==2 %}
+                    <div class="am-tab-panel am-active">
                         <form class="am-form" method="post">
                             <div class="am-g am-margin-top-sm">
                                 <div class="am-u-sm-4 am-u-md-2 am-text-right">
@@ -252,8 +261,9 @@
 
                         </form>
                     </div>
-
+                    {%endif%}
                 </div>
+
             </div>
 
         </div>

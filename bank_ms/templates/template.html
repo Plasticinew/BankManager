@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>table manage system</title>
+    <title>bank manage system</title>
     <meta name="description" content="to manage bank">
     <meta name="keywords" content="table">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -62,19 +62,13 @@
         <div class="admin-content-body">
             <div class="am-cf am-padding am-padding-bottom-0">
                 <div class="am-fl am-cf">
-                    <strong class="am-text-primary am-text-lg">表单</strong> /
-                    <small>form</small>
+                    {% block title %}{% endblock %}
                 </div>
             </div>
 
             <hr>
-
-            {%if succ==1%}
-                <strong class="am-text-primary am-text-lg">成功删除</strong>
-            {%else%}
-                <strong class="am-text-primary am-text-lg">删除失败</strong>
-            {%endif%}
-
+            {% block body %}
+            {% endblock %}
 
         </div>
 
