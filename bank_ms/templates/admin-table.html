@@ -84,7 +84,7 @@
 				<input name="name" id="name" required="" size="6" >
 				<label for="city">城市</label>
 				<input name="city" id="city" required="" size="6">
-				<select name="cars" data-am-selected="{btnSize: 'sm'}" size="6">
+				<select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
 					<option value="option1">--排序方式--</option>
 					<option value="option2">余额</option>
 					<option value="option3">名称</option>
@@ -101,14 +101,14 @@
             <table class="am-table am-table-striped am-table-hover table-main">
               <thead>
               <tr>
-                <th ></th><th class="table-id">ID</th><th class="table-title">名称</th><th class="table-type">城市</th><th class="table-author">资产</th><th class="table-set">操作</th>
+                <th ></th><th class="table-id">ID</th><th class="table-title" width="40%">名称</th><th class="table-type">城市</th><th class="table-author">资产</th><th class="table-set">操作</th>
               </tr>
               </thead>
 			  <tbody>
 			  	{% for dbank in cont %}
 			  	<tr>
 			  		<td><input type="checkbox" /></td>
-			  		<td>{{loop.index}}</td>
+			  		<td>{{loop.index+page*10}}</td>
 					<td>{{dbank[0]}}</td>
 					<td>{{dbank[1]}}</td>
 					<td class="am-hide-sm-only">{{dbank[2]}}</td>
@@ -116,7 +116,6 @@
 			  			<div class="am-btn-toolbar">
 			  				<div class="am-btn-group am-btn-group-xs">
 			  					<button class="am-btn am-btn-default am-btn-xs am-text-secondary"><span class="am-icon-pencil-square-o"></span> 编辑</button>
-			  					<button class="am-btn am-btn-default am-btn-xs am-hide-sm-only"><span class="am-icon-copy"></span> 复制</button>
 			  					<button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span class="am-icon-trash-o"></span> 删除</button>
 			  				</div>
 			  			</div>
@@ -129,13 +128,11 @@
      
               <div class="am-fr">
                 <ul class="am-pagination">
-                  <li class="am-disabled"><a href="#">«</a></li>
-                  <li class="am-active"><a href="#">1</a></li>
-                  <li><a href="#">2</a></li>
-                  <li><a href="#">3</a></li>
-                  <li><a href="#">4</a></li>
-                  <li><a href="#">5</a></li>
-                  <li><a href="#">»</a></li>
+                  <li {% if page==0 %} class="am-disabled" {% endif %}><a href="{{ url_for('bank.table', page=page-1) }}">«</a></li>
+                    {% for place in range(tot//10+1) %}
+                  <li {% if page==place %} class="am-active" {% endif %}><a href="#">{{place}}</a></li>
+                    {% endfor %}
+                  <li {% if page*10+10>tot %} class="am-disabled" {% endif %}><a href="{{ url_for('bank.table', page=page+1) }}">»</a></li>
                 </ul>
               </div>
             </div>
