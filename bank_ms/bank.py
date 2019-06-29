@@ -102,6 +102,8 @@ def bank(page=None, refresh=1):
     if request.method == 'POST':
         name = request.form['name']
         city = request.form['city']
+        minp = request.form['minp']
+        maxp = request.form['maxp']
         waytosort = request.form['way']
         cont = [[name, city, waytosort]]
 

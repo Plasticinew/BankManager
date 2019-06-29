@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="am-g">
-    <div class="am-u-sm-12 am-u-md-6">
+    <div class="am-u-sm-12 am-u-md-4">
         <div class="am-btn-toolbar">
             <div class="am-btn-group am-btn-group-xs">
                 <a href="{{url_for('bank.addbank')}}">
@@ -20,12 +20,16 @@
             </div>
         </div>
     </div>
-    <div class="am-u-sm-12 am-u-md-6">
+    <div class="am-u-sm-12 am-u-md-8">
         <form method="post">
             <label for="name">名称</label>
             <input name="name" id="name" size="6">
             <label for="city">城市</label>
             <input name="city" id="city" size="6">
+            <label for="minp">资产范围</label>
+            <input name="minp" id="minp" size="4">
+            <label for="maxp">-</label>
+            <input name="maxp" id="maxp" size="4">
             <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
                 <option value="option0">--排序方式--</option>
                 <option value="option1">余额</option>
