@@ -17,8 +17,6 @@ engine = create_engine( \
     'mysql+mysqlconnector://root:mayuxin1999@localhost:3306/bankdbms')
 DBSession = sessionmaker(bind=engine)
 
-
-
 Base = declarative_base()
 
 class BankClass(Base):

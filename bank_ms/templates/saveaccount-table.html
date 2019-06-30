@@ -1,0 +1,141 @@
+﻿{% extends "template.html" %}
+{% block title %}<strong class="am-text-primary am-text-lg">储蓄账户管理</strong> /
+<small>Save Account</small>{% endblock %}
+
+{% block body %}
+<div class="am-g">
+    <div class="am-u-sm-12 am-u-md-4">
+        <div class="am-btn-toolbar">
+            <div class="am-btn-group am-btn-group-xs">
+                <a href="{{url_for('bank.addsaveaccount')}}">
+                    <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
+                        新增
+                    </button>
+                </a>
+                <a href="{{url_for('bank.success',p='saveaccount')}}">
+                    <button type="button" class="am-btn am-btn-default"><span class="am-icon-save"></span>
+                        保存
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="am-u-sm-12 am-u-md-8">
+        <form method="post">
+            <label for="saveaccountid">账户ID</label>
+            <input name="saveaccountid" id="saveaccountid" size="6">
+            <label for="bankname">开户行</label>
+            <input name="bankname" id="bankname" size="5">
+            <label for="clientid">客户ID</label>
+            <input name="clientid" id="clientid" size="6">
+            <label for="clientname">客户姓名</label>
+            <input name="clientname" id="clientname" size="6">
+            <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
+                <option value="option0">--排序方式--</option>
+                <option value="option1">账户ID</option>
+                <option value="option2">客户ID</option>
+                <option value="option3">客户姓名</option>
+            </select>
+            <input type="submit" value="查询">
+        </form>
+    </div>
+</div>
+<div class="am-g">
+    <div class="am-u-sm-12">
+        <form class="am-form">
+            <table class="am-table am-table-striped am-table-hover table-main">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="table-id">序号</th>
+                    <th class="table-title" width="10%">账户ID</th>
+                    <th class="table-title" width="10%">开户行</th>
+                    <th class="table-title" width="10%">客户ID</th>
+                    <th class="table-title" width="8%">客户姓名</th>
+                    <th class="table-title" width="12%">余额</th>
+                    <th class="table-title" width="10%">开户日期</th>
+                    <th class="table-title" width="10%">利率</th>
+                    <th class="table-title" width="10%">币种</th>
+                    <th class="table-set">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for dbank in cont[page*10:page*10+10] %}
+                <tr>
+                    <td></td>
+                    <td>{{loop.index+page*10}}</td>
+                    <td>{{dbank[0]}}</td>
+                    <td>{{dbank[1]}}</td>
+                    <td>{{dbank[2]}}</td>
+                    <td>{{dbank[3]}}</td>
+                    <td>{{dbank[4]}}</td>
+                    <td>{{dbank[5]}}</td>
+                    <td>{{dbank[6]}}</td>
+                    <td>{{dbank[7]}}</td>
+                    <td>
+                        <div class="am-btn-toolbar">
+                            <div class="am-btn-group am-btn-group-xs">
+                                <a href="{{url_for('bank.editsaveaccount',pk = dbank[0])}}"
+                                   class="am-btn am-btn-xs am-text-secondary"><span
+                                        class="am-icon-pencil-square-o"></span> 编辑
+
+                                </a>
+                                <a href="{{url_for('bank.delsaveaccount',pk = dbank[0])}}"
+                                   class="am-btn am-btn-xs am-text-danger">
+                                    <span class="am-icon-trash-o"></span> 删除
+
+                                </a>
+
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="am-cf">
+                共{{tot}}条记录，当前显示{{page*10+1}}到{% if page*10+10>tot %}{{tot}}{%else%}{{page*10+10}}{%endif%}条
+                <div class="am-fr">
+                    <ul class="am-pagination">
+                        <li {% if page==0 %} class="am-disabled" {% endif %}><a
+                                href="{{url_for('bank.saveaccount',page = page-1)}}">«</a></li>
+
+                        {%if page<=2%}
+                        {%set min=0%}
+                        {%else%}
+
+                        {%set min=page-2%}
+                        <li><a href="#">...</a></li>
+                        {%endif%}
+
+                        {%if tot//10+1<min+5 %}
+                                {%set max=tot//10+1%}
+                                {%else%}
+                                {%set max=min+5%}
+                                {%endif%}
+
+                                {% for place in range(min,max) %}
+                        <li {% if page==place %} class="am-active" {% endif %}><a
+                                href="{{url_for('bank.saveaccount',page = place)}}">{{place+1}}</a>
+                        </li>
+                        {% endfor %}
+                        {%if tot//10+1>min+5 %}
+                        <li><a href="#">...</a></li>
+                        {%endif%}
+
+
+                        <li {% if page*10+10>tot %} class="am-disabled" {% endif %}><a
+                                href="{{url_for('bank.saveaccount',page = page+1)}}">»</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr/>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
+
+

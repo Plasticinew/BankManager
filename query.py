@@ -143,24 +143,30 @@ def delClient(session, id):
         raise Exception("ForeignKey constraint.")
 
 
-def getAccount(session, clientid='', clientname='', type='All', bank=''):
+def getCheckAccount(session, clientid='', clientname='', bank=''):
     checkaccountList=[]
+    namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
+    for account in session.query(OpenAccountClass)\
+            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.ClientID.in_(namelist), OpenAccountClass.BankName.like('%'+bank+'%'))\
+            .order_by(OpenAccountClass.ClientID):
+        checkaccount = account.checkaccountid
+        '''账户ID，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
+        checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,
+                          checkaccount.Balance, checkaccount.DateOpening, checkaccount.Overdraft])
+    return checkaccountList
+
+
+def getSaveAccount(session, clientid='', clientname='', bank=''):
     saveaccountList=[]
     namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
     for account in session.query(OpenAccountClass)\
             .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.ClientID.in_(namelist), OpenAccountClass.BankName.like('%'+bank+'%'))\
             .order_by(OpenAccountClass.ClientID):
-        if type != 'SaveAccount' and account.CheckAccountID != db.null :
-            checkaccount = account.checkaccountid
-            '''账户ID，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
-            checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,
-                                checkaccount.Balance, checkaccount.DateOpening, checkaccount.Overdraft])
-        if type != 'CheckAccount' and account.SaveAccountID != db.null :
-            saveaccount = account.saveaccountid
-            '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
-            saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,
-                                saveaccount.Balance, saveaccount.DateOpening, saveaccount.Rate, saveaccount.MoneyType])
-    return checkaccountList, saveaccountList
+        saveaccount = account.saveaccountid
+        '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
+        saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,
+                          saveaccount.Balance, saveaccount.DateOpening, saveaccount.Rate, saveaccount.MoneyType])
+    return saveaccountList
 
 
 def newSaveAccount(session, accountid, clientid, bank, balance, date, rate, moneytype):
@@ -319,7 +325,7 @@ def addPay(session, payid, loanid, date, amount):
     session.add(pay)
 
 
-#def calculate(session):
+def calculate(session):
 
 
 if __name__ == '__main__':
