@@ -136,4 +136,7 @@ def editstaff(pk):
 def delstaff(pk):
     with session_scope() as session:
         delStaff(session, pk)
+    with session_scope() as session:
+        global cont
+        cont = getStaff(session)
     return render_template("success.html", action="删除", succ=1, showurl=url_for("staff.staff", page=0), messege=None)
