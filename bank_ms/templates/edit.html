@@ -8,7 +8,7 @@
 <div class="am-tabs am-margin" data-am-tabs>
     <ul class="am-tabs-nav am-nav am-nav-tabs">
         {%if type==0 %}
-        <li class="am-active"><a href="#tab1">修改账户</a></li>
+        <li class="am-active"><a href="#tab1">修改储蓄账户</a></li>
         {%endif%}
         {%if type==1 %}
         <li class="am-active"><a href="#tab2">修改员工</a></li>
@@ -19,89 +19,81 @@
         {%if type==3 %}
         <li class="am-active"><a href="#tab4">修改客户</a></li>
         {%endif%}
+        {%if type==4 %}
+        <li class="am-active"><a href="#tab5">修改支票账户</a></li>
+        {%endif%}
     </ul>
 
     <div class="am-tabs-bd">
         {%if type==0 %}
         <div class="am-tab-panel am-active">
-            <div class="am-g am-margin-top">
-                <div class="am-u-sm-4 am-u-md-2 am-text-right">所属类别</div>
-                <div class="am-u-sm-8 am-u-md-10">
-                    <select data-am-selected="{btnSize: 'sm'}">
-                        <option value="option1">选项一...</option>
-                        <option value="option2">选项二.....</option>
-                        <option value="option3">选项三........</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="am-g am-margin-top">
-                <div class="am-u-sm-4 am-u-md-2 am-text-right">显示状态</div>
-                <div class="am-u-sm-8 am-u-md-10">
-                    <div class="am-btn-group" data-am-button>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="radio" name="options" id="option1"> 正常
-                        </label>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="radio" name="options" id="option2"> 待审核
-                        </label>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="radio" name="options" id="option3"> 不显示
-                        </label>
+            <form class="am-form" method="post">
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="accountid">账户ID</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="accountid" id="accountid">
                     </div>
                 </div>
-            </div>
-
-            <div class="am-g am-margin-top">
-                <div class="am-u-sm-4 am-u-md-2 am-text-right">推荐类型</div>
-                <div class="am-u-sm-8 am-u-md-10">
-                    <div class="am-btn-group" data-am-button>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="checkbox"> 允许评论
-                        </label>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="checkbox"> 置顶
-                        </label>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="checkbox"> 推荐
-                        </label>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="checkbox"> 热门
-                        </label>
-                        <label class="am-btn am-btn-default am-btn-xs">
-                            <input type="checkbox"> 轮播图
-                        </label>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="bankname">所在支行</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="bankname" id="bankname">
                     </div>
                 </div>
-            </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="clientid">客户ID</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="clientid" id="clientid">
+                    </div>
+                </div>
 
-            <div class="am-g am-margin-top">
-                <div class="am-u-sm-4 am-u-md-2 am-text-right">
-                    发布日期
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="balance">余额</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="balance" id="balance">
+                    </div>
                 </div>
-                <div class="am-u-sm-8 am-u-md-10">
-                    <form action="" class="am-form am-form-inline">
-                        <div class="am-form-group am-form-icon">
-                            <i class="am-icon-calendar"></i>
-                            <input type="date" class="am-form-field am-input-sm" placeholder="日期">
-                        </div>
-                    </form>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="dateopening">修改日期</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="date" class="am-input-sm" name="dateopening" id="dateopening">
+                    </div>
                 </div>
-            </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="rate">利率</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="rate" id="rate">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="moneytype">币种</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="moneytype" id="moneytype">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="submit" value="提交修改" class="am-btn am-btn-primary am-btn-xs">
+                    </div>
+                </div>
 
-            <div class="am-g am-margin-top">
-                <div class="am-u-sm-4 am-u-md-2 am-text-right">
-                    发布时间
-                </div>
-                <div class="am-u-sm-8 am-u-md-10">
-                    <form action="" class="am-form am-form-inline">
-                        <div class="am-form-group am-form-icon">
-                            <i class="am-icon-calendar"></i>
-                            <input type="datetime-local" class="am-form-field am-input-sm" placeholder="时间">
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </form>
 
         </div>
         {%endif%}
@@ -257,6 +249,69 @@
                     </div>
                     <div class="am-u-sm-8 am-u-md-4 am-u-end">
                         <input type="text" class="am-input-sm" name="address" id="address">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="submit" value="提交修改" class="am-btn am-btn-primary am-btn-xs">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        {%endif%}
+        {%if type==4 %}
+        <div class="am-tab-panel am-active">
+            <form class="am-form" method="post">
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="accountid">账户ID</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="accountid" id="accountid">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="bankname">所在支行</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="bankname" id="bankname">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="clientid">客户ID</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="clientid" id="clientid">
+                    </div>
+                </div>
+
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="balance">余额</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="balance" id="balance">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="dateopening">修改日期</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="date" class="am-input-sm" name="dateopening" id="dateopening">
+                    </div>
+                </div>
+                <div class="am-g am-margin-top-sm">
+                    <div class="am-u-sm-4 am-u-md-2 am-text-right">
+                        <label for="overdraft">透支额</label>
+                    </div>
+                    <div class="am-u-sm-8 am-u-md-4 am-u-end">
+                        <input type="text" class="am-input-sm" name="overdraft" id="overdraft">
                     </div>
                 </div>
                 <div class="am-g am-margin-top-sm">
