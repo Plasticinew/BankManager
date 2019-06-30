@@ -12,9 +12,9 @@ from werkzeug.security import check_password_hash
 
 
 from BankManager.db import session_scope, UserClass
+from BankManager.error import flash
 
 bp = Blueprint("auth", __name__)
-
 
 def login_required(view):
     """View decorator that redirects anonymous users to the login page."""
@@ -55,8 +55,6 @@ def login():
                 .filter(UserClass.username.like(username)).first()
             true_username = user.username
             true_password = user.password
-        print(true_username)
-        print(true_password)
 
         if user is None:
             error = "Incorrect username."
@@ -67,9 +65,8 @@ def login():
             # store the user id in a new session and return to the index
             session.clear()
             session["user_id"] = true_username
-            return redirect(url_for("index"))
-        print("error")
-        flash(error)
+            return redirect(url_for("bank.bank", page=0))
+        return flash(error, "登陆账户", "login.html")
 
     return render_template("login.html")
 
@@ -77,4 +74,4 @@ def login():
 def logout():
     """Clear the current session, including the stored user id."""
     session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for("auth.login", page=0))

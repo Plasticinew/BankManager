@@ -3,7 +3,6 @@ from flask import request
 from flask import redirect
 from flask import url_for
 from flask import render_template
-from flask import g
 
 from BankManager.db import session_scope
 
@@ -12,6 +11,9 @@ from BankManager.auth import login_required
 from BankManager.query import getBank, newBank, setBank, delBank
 
 from BankManager.error import flash
+
+
+
 with session_scope() as session:
     global cont
     cont = getBank(session)
