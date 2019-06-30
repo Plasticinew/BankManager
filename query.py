@@ -8,6 +8,8 @@ from BankManager.db import BankClass, StaffClass
 
 
 
+
+
 def getBank(session, name='', city='', propertylow=0, propertyhigh=1000000000, smallfirst=True, orderby='BankName'):
     bankList=[]
     for bank in session.query(BankClass) \

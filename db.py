@@ -22,6 +22,16 @@ DBSession = sessionmaker(bind=engine)
 Base = declarative_base()
 
 
+class LogClass(Base):
+    __tablename__ = 'Log'
+
+    Time = Column(DATE, nullable=False)
+    ClientID = Column(CHAR(18),ForeignKey(Client.ClientID))
+    Action = Column(INT, nullable=False)
+    Type = Column(CHAR(18),nullable=False)
+    clientid = relationship('ClientClass', backref='LogofClinet', foreign_keys=[ClientID])
+
+
 class BankClass(Base):
     __tablename__ = 'Bank'
 
