@@ -195,7 +195,7 @@ def delbank(pk):
 
 @bp.route("/success<string:p>", methods=('GET', 'POST'))
 def success(p):
-    return render_template("success.html", action="保存", succ=1, showurl=url_for(p + '.' + p, page=0), messege=None)
+    return render_template("success.html", action="保存", succ=1, showurl=url_for("bank."+p, page=0), messege=None)
 
 
 @bp.route("/", methods=("GET", "POST"))
@@ -209,3 +209,56 @@ def login():
     return render_template("login.html")
 
 
+@bp.route("/client<int:page>", methods=('GET', 'POST'))
+def client(page=None):
+    if not page:
+        page = 0
+
+    cont = [['aa', 'aaa', '100', '111', '3423', '3223'],
+            ['bb', 'bbb', '1000', 'bb', 'bbb', '1000'],
+            ['cc', 'ccc', '10000', 'cc', 'ccc', '10000']
+            ]
+
+    if request.method == 'POST':
+        clientid = request.form['clientid']
+        clientname = request.form['clientname']
+        staffid = request.form['staffid']
+        staffname = request.form['staffname']
+        phone = request.form['phone']
+        waytosort = request.form['way']
+
+    return render_template("client-table.html", page=page, cont=cont, tot=len(cont))
+
+
+@bp.route("/addclient", methods=('GET', 'POST'))
+def addclient():
+    if request.method == 'POST':
+        clientid = request.form['clientid']
+        clientname = request.form['clientname']
+        staffid = request.form['staffid']
+        staffname = request.form['staffname']
+        address = request.form['address']
+        phone = request.form['phone']
+
+        return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.client", page=0),
+                               messege=None)
+    return render_template("edit.html", type=3)
+
+
+@bp.route("/editclient<string:pk>", methods=('GET', 'POST'))
+def editclient(pk):
+    if request.method == 'POST':
+        clientid = request.form['clientid']
+        clientname = request.form['clientname']
+        staffid = request.form['staffid']
+        staffname = request.form['staffname']
+        address = request.form['address']
+        phone = request.form['phone']
+
+        return render_template("success.html", action="修改", succ=1, showurl=url_for("bank.client", page=0), messege=None)
+    return render_template("edit.html", type=3)
+
+
+@bp.route("/delclient<string:pk>", methods=('GET', 'POST'))
+def delclient(pk):
+    return render_template("success.html", action="删除", succ=1, showurl=url_for("bank.client", page=0), messege=None)
