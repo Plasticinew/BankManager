@@ -21,18 +21,6 @@ DBSession = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
-
-class LogClass(Base):
-    __tablename__ = 'Log'
-
-    Time = Column(DATE, nullable=False)
-    AccountID = Column(CHAR(18),ForeignKey(AccountCLass.AccountID))
-    Action = Column(FLOAT, nullable=False)
-    newValue = Column(FLOAT, nullable=False)
-    Type = Column(CHAR(18),nullable=False)
-    accountid = relationship('AccountClass', backref='LogofAccount', foreign_keys=[AccountID])
-
-
 class BankClass(Base):
     __tablename__ = 'Bank'
 
@@ -157,6 +145,17 @@ class UserClass(Base):
     password = Column(CHAR(255), nullable=False)
     # permissions from 0 to 3
     permissions = Column(INT, nullable=False)
+
+class LogClass(Base):
+    __tablename__ = 'Log'
+
+    LogNumber = Column(INT, primary_key=True, nullable=False, autoincrement=True)
+    Time = Column(DATE, nullable=False)
+    AccountID = Column(CHAR(18),ForeignKey(AccountClass.AccountID))
+    Action = Column(FLOAT, nullable=False)
+    newValue = Column(FLOAT, nullable=False)
+    Type = Column(CHAR(18),nullable=False)
+    accountid = relationship('AccountClass', backref='LogofAccount', foreign_keys=[AccountID])
 
 from contextlib import contextmanager
 
