@@ -153,6 +153,7 @@ class LogClass(Base):
     Action = Column(FLOAT, nullable=False)
     newValue = Column(FLOAT, nullable=False)
     Type = Column(CHAR(18),nullable=False)
+    Bank = Column(CHAR(18),nullable=False)
     accountid = relationship('AccountClass', backref='LogofAccount', foreign_keys=[AccountID])
 
 from contextlib import contextmanager

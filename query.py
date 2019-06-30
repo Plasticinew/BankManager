@@ -194,7 +194,7 @@ def newSaveAccount(session, accountid, clientid, bank, balance, date, rate, mone
         session.add(openaccount)
     else:
         openaccount[0].SaveAccountID = accountid
-    log = LogClass(Time=date, AccountID=accountid, Action=balance, newValue=balance,
+    log = LogClass(Time=date, AccountID=accountid, Action=balance, newValue=balance,Bank=bank,
                    Type='SaveAccount')
     session.add(log)
 
@@ -219,7 +219,7 @@ def newCheckAccount(session, accountid, clientid, bank, balance, date, overdraft
         session.add(openaccount)
     else:
         openaccount[0].CheckAccountID = accountid
-    log = LogClass(Time=date, AccountID=accountid, Action=balance, newValue=balance,
+    log = LogClass(Time=date, AccountID=accountid, Action=balance, newValue=balance, Bank=bank,
                    Type='CheckAccount')
     session.add(log)
 
@@ -234,14 +234,14 @@ def setAccount_balance(session, accountid, balance, date):
         checkaccount.Balance = balance
         checkaccount.DateOpening = date
         log = LogClass(Time=date, AccountID=accountid, Action=balance - oldbalance, newValue=balance,
-                       Type='CheckAccount')
+                       Type='CheckAccount', Bank=checkaccount.OpenofCheck[0].BankName)
         session.add(log)
     if (len(account.SaveofAccount) != 0):
         saveaccount = session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).first()
         saveaccount.Balance = balance
         saveaccount.DateOpening = date
         log = LogClass(Time=date, AccountID=accountid, Action=balance - oldbalance, newValue=balance,
-                       Type='SaveAccount')
+                       Type='SaveAccount', Bank=saveaccount.OpenofCheck[0].BankName)
         session.add(log)
 
 
@@ -266,7 +266,7 @@ def delAccount(session, accountid):
     if (len(account.SaveofAccount) != 0):
         log = LogClass(Time=account.SaveofAccount[0].DateOpening, AccountID=account.SaveofAccount[0].AccountID,
                        Action=-account.SaveofAccount[0].Balance, newValue=0,
-                       Type='SaveAccount')
+                       Type='SaveAccount', Bank=account.SaveofAccount[0].OpenofSave[0].BankName)
         session.add(log)
         pk = (account.SaveofAccount[0].OpenofSave[0].BankName, \
               account.SaveofAccount[0].OpenofSave[0].ClientID)
@@ -276,7 +276,7 @@ def delAccount(session, accountid):
     if (len(account.CheckofAccount) != 0):
         log = LogClass(Time=account.CheckofAccount[0].DateOpening, AccountID=account.CheckofAccount[0].AccountID,
                        Action=-account.CheckofAccount[0].Balance, newValue=0,
-                       Type='CheckAccount')
+                       Type='CheckAccount', Bank=account.CheckofAccount[0].OpenofCheck[0].BankName)
         session.add(log)
         pk = (account.CheckofAccount[0].OpenofCheck[0].BankName, \
               account.CheckofAccount[0].OpenofCheck[0].ClientID)
