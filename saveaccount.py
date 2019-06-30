@@ -113,7 +113,7 @@ def addsaveaccount():
             return render_template("success.html", action="添加", succ=1, showurl=url_for("saveaccount.saveaccount", page=0),
                                message=None)
 
-    return render_template("edit.html", type=0)
+    return render_template("edit.html", type=0, show=1)
 
 
 @bp.route("/editsaveaccount<string:pk>", methods=('GET', 'POST'))

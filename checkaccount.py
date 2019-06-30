@@ -109,7 +109,7 @@ def addcheckaccount():
 
         return render_template("success.html", action="添加", succ=1, showurl=url_for("checkaccount.checkaccount", page=0),
                                message=None)
-    return render_template("edit.html", type=4)
+    return render_template("edit.html", type=4, show=1)
 
 
 @bp.route("/editcheckaccount<string:pk>", methods=('GET', 'POST'))
