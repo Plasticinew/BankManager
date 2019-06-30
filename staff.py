@@ -6,6 +6,7 @@ from flask import url_for
 from BankManager.auth import login_required
 from BankManager.db import session_scope
 from BankManager.query import getStaff, newStaff, setStaff, delStaff
+from BankManager.error import flash
 
 with session_scope() as session:
     global cont
@@ -14,6 +15,7 @@ with session_scope() as session:
 bp = Blueprint("staff", __name__)
 
 @bp.route("/staff<int:page>", methods=('GET', 'POST'))
+@login_required
 def staff(page=None):
     if not page:
         page = 0
@@ -52,6 +54,7 @@ def staff(page=None):
 
 
 @bp.route("/addstaff", methods=('GET', 'POST'))
+@login_required
 def addstaff():
     if request.method == 'POST':
         error = None
@@ -88,7 +91,7 @@ def addstaff():
 
         if error is not None:
             print(error)
-            flash(error)
+            return flash(error, action="添加员工", showurl=url_for("staff.staff", page=0))
         else:
             with session_scope() as session:
                 newStaff(session, staffid, bankname, staffname, phone, address, datestartworking)
@@ -102,6 +105,7 @@ def addstaff():
 
 
 @bp.route("/editstaff<string:pk>", methods=('GET', 'POST'))
+@login_required
 def editstaff(pk):
     if request.method == 'POST':
         staffid = request.form['staffid']
@@ -133,6 +137,7 @@ def editstaff(pk):
 
 
 @bp.route("/delstaff<string:pk>", methods=('GET', 'POST'))
+@login_required
 def delstaff(pk):
     with session_scope() as session:
         delStaff(session, pk)
