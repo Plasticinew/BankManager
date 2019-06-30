@@ -132,11 +132,8 @@ def editsaveaccount(pk):
 
         with session_scope() as session:
             if accountid:
-                try:
-                    setAccount_others(session, pk, accountid, "AccountID")
-                except Exception as e:
-                    error = e.args[0]
-                    return flash(error, "编辑储蓄账户", url_for("saveaccount.saveaccount", page=0))
+                error = "不允许修改账户ID！"
+                return flash(error, "编辑储蓄账户", url_for("saveaccount.saveaccount", page=0))
 
             if bankname:
                 setAccount_others(session, pk, bankname, "BankName")
