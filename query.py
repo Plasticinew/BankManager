@@ -142,7 +142,7 @@ def delClient(session):
         raise Exception("ForeignKey constraint.")
 
 
-def getCheckAccount(session, accountid='', clientid='', clientname='', bank='', orderby='ClientID'):
+def getCheckAccount(session, accountid='', clientid='', clientname='', bank='', orderby='CheckAccountID'):
     checkaccountList=[]
     for account, client in session.query(OpenAccountClass, ClientClass)\
             .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'),
@@ -153,12 +153,12 @@ def getCheckAccount(session, accountid='', clientid='', clientname='', bank='', 
             .order_by(OpenAccountClass.__getattribute__(OpenAccountClass, orderby)):
         checkaccount = account.checkaccountid
         '''账户ID，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
-        checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,checkaccount.clientid[0].ClientName,
+        checkaccountList.append([checkaccount.AccountID, account.BankName, account.ClientID, account.clientid.ClientName,
                           checkaccount.Balance, checkaccount.DateOpening, checkaccount.Overdraft])
     return checkaccountList
 
 
-def getSaveAccount(session, accountid='', clientid='', clientname='', bank='', orderby='ClientID'):
+def getSaveAccount(session, accountid='', clientid='', clientname='', bank='', orderby='SaveAccountID'):
     saveaccountList=[]
     # namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
     for account, client in session.query(OpenAccountClass, ClientClass)\
@@ -280,7 +280,7 @@ def delAccount(session, accountid):
         session.add(log)
         pk = (account.CheckofAccount[0].OpenofCheck[0].BankName, \
               account.CheckofAccount[0].OpenofCheck[0].ClientID)
-        session.delete(account.CheckofAccount)
+        session.delete(account.CheckofAccount[0])
         session.commit()
         # session.delete(account.CheckofAccount[0].OpenofCheck[0])
 
