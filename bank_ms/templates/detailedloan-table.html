@@ -1,0 +1,91 @@
+﻿{% extends "template.html" %}
+{% block title %}<strong class="am-text-primary am-text-lg">贷款详情</strong> /
+<small>Detail</small>{% endblock %}
+
+{% block body %}
+<div class="am-g">
+    <div class="am-u-sm-12 am-u-md-4">
+        <div class="am-btn-toolbar">
+            <div class="am-btn-group am-btn-group-xs">
+                <a href="{{url_for('bank.addpay')}}">
+                    <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
+                        新增
+                    </button>
+                </a>
+                <a href="{{url_for('bank.success',p='loan')}}">
+                    <button type="button" class="am-btn am-btn-default"><span class="am-icon-save"></span>
+                        保存
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="am-u-sm-12 am-u-md-8">
+        <form method="post">
+            <label for="payid">付款ID</label>
+            <input name="payid" id="payid" size="6">
+            <label for="paydate">付款日期</label>
+            <input name="paydate" id="paydate" size="10">
+
+            <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
+                <option value="option0">--排序方式--</option>
+                <option value="option1">付款日期</option>
+                <option value="option2">付款金额</option>
+            </select>
+            <input type="submit" value="查询">
+        </form>
+    </div>
+</div>
+<div class="am-g">
+    <div class="am-u-sm-12">
+        <form class="am-form">
+            <table class="am-table am-table-striped am-table-hover table-main">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th class="table-id">序号</th>
+                    <th class="table-title" width="15%">付款ID</th>
+                    <th class="table-title" width="20%">付款日期</th>
+                    <th class="table-title" width="20%">付款金额</th>
+                    <th class="table-set">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for dbank in cont %}
+                <tr>
+                    <td></td>
+                    <td>{{loop.index}}</td>
+                    <td>{{dbank[0]}}</td>
+                    <td>{{dbank[1]}}</td>
+                    <td>{{dbank[2]}}</td>
+
+                    <td>
+                        <div class="am-btn-toolbar">
+                            <div class="am-btn-group am-btn-group-xs">
+                                <a href="{{url_for('bank.delpay',pk = dbank[0])}}"
+                                   class="am-btn am-btn-xs am-text-danger">
+                                    <span class="am-icon-trash-o"></span> 删除
+
+                                </a>
+
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="am-cf">
+                共{{tot}}条记录
+
+            </div>
+            <hr/>
+
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
+
+

@@ -374,3 +374,74 @@ def delcheckaccount(pk):
     return render_template("success.html", action="删除", succ=1, showurl=url_for("bank.checkaccount", page=0), message=None)
 
 
+@bp.route("/loan<int:page>", methods=('GET', 'POST'))
+def loan(page=None):
+    if not page:
+        page = 0
+
+    cont = [['1', 'aaa', '100', '111', '3423', '3223'],
+            ['2', 'bbb', '1000', 'bb', 'bbb', '1000'],
+            ['3', 'ccc', '10000', 'cc', 'ccc', '10000']
+            ]
+
+    if request.method == 'POST':
+        loanid = request.form['loanid']
+        bankname = request.form['bankname']
+        clientid = request.form['clientid']
+        clientname = request.form['clientname']
+        waytosort = request.form['way']
+
+    return render_template("loan-table.html", page=page, cont=cont, tot=len(cont))
+
+
+@bp.route("/detailedloan<int:loanid>", methods=('GET', 'POST'))
+def detailedloan(loanid=None):
+
+    cont = [['1', '2', '100'],
+            ['2', '3', '1000'],
+            ['3', '4', '10000']
+            ]
+
+    if request.method == 'POST':
+        loanid = request.form['loanid']
+        bankname = request.form['bankname']
+        clientid = request.form['clientid']
+        clientname = request.form['clientname']
+        waytosort = request.form['way']
+
+    return render_template("detailedloan-table.html", cont=cont, tot=len(cont))
+
+
+@bp.route("/addloan", methods=('GET', 'POST'))
+def addloan():
+    if request.method == 'POST':
+        loanid = request.form['loanid']
+        bankname = request.form['bankname']
+        clientid = request.form['clientid']
+        amount = request.form['amount']
+        return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.loan", page=0),
+                               message=None)
+    return render_template("edit.html", type=5)
+
+
+@bp.route("/delloan<string:pk>", methods=('GET', 'POST'))
+def delloan(pk):
+    return render_template("success.html", action="删除", succ=1, showurl=url_for("bank.loan", page=0), message=None)
+
+
+@bp.route("/addpay", methods=('GET', 'POST'))
+def addpay():
+    if request.method == 'POST':
+        payid = request.form['payid']
+        loanid = request.form['loanid']
+        date = request.form['date']
+        amount = request.form['amount']
+        return render_template("success.html", action="添加", succ=1, showurl=None,
+                               message=None)
+    return render_template("edit.html", type=6)
+
+
+@bp.route("/delpay<string:pk>", methods=('GET', 'POST'))
+def delpay(pk):
+    return render_template("success.html", action="删除", succ=1, showurl=None, message=None)
+
