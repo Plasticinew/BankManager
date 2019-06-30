@@ -2,7 +2,7 @@ import sqlalchemy as db
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from BankManager.db import BankClass, StaffClass
+from BankManager.db import BankClass, StaffClass, LogClass
 # ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
 # SaveAccountClass, CheckAccountClass
 
@@ -182,6 +182,9 @@ def newSaveAccount(session, accountid, clientid, bank, balance, date, rate, mone
         session.add(openaccount)
     else:
         openaccount[0].SaveAccountID = accountid
+    log = LogClass(Time=date, AccountID=accountid, Action=balance, newValue=balance,
+                   Type='SaveAccount')
+    session.add(log)
 
 
 def newCheckAccount(session, accountid, clientid, bank, balance, date, overdraft):
@@ -204,13 +207,34 @@ def newCheckAccount(session, accountid, clientid, bank, balance, date, overdraft
         session.add(openaccount)
     else:
         openaccount[0].CheckAccountID = accountid
+    log = LogClass(Time=date, AccountID=accountid, Action=balance, newValue=balance,
+                   Type='CheckAccount')
+    session.add(log)
 
 
-
-def setAccount(session, accountid, new, attribute):
+def setAccount_balance(session, accountid, balance, date):
     account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
-    if(attribute in ['Balance','DateOpening']):
-        account.__setattr__(attribute, new)
+    oldbalance = account.Balance
+    account.Balance = balance
+    account.DateOpening = date
+    if (len(account.CheckofAccount) != 0):
+        checkaccount = session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).first()
+        checkaccount.Balance = balance
+        checkaccount.DateOpening = date
+        log = LogClass(Time=date, AccountID=accountid, Action=balance - oldbalance, newValue=balance,
+                       Type='CheckAccount')
+        session.add(log)
+    if (len(account.SaveofAccount) != 0):
+        saveaccount = session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).first()
+        saveaccount.Balance = balance
+        saveaccount.DateOpening = date
+        log = LogClass(Time=date, AccountID=accountid, Action=balance - oldbalance, newValue=balance,
+                       Type='SaveAccount')
+        session.add(log)
+
+
+def setAccount_others(session, accountid, new, attribute):
+    account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
     if (len(account.CheckofAccount) != 0):
         checkaccount = session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).first()
         checkaccount.__setattr__(attribute, new)
@@ -222,12 +246,21 @@ def setAccount(session, accountid, new, attribute):
 def delAccount(session, accountid):
     account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
     if (len(account.SaveofAccount) != 0):
+        log = LogClass(Time=account.SaveofAccount[0].Time, AccountID=account.SaveofAccount[0].AccountID,
+                       Action=-account.SaveofAccount[0].Action, newValue=account.SaveofAccount[0].newValue,
+                       Type='SaveAccount')
+        session.add(log)
         session.delete(account.SaveofAccount[0].OpenofSave)
         session.delete(account.SaveofAccount[0])
     if (len(account.CheckofAccount) != 0):
+        log = LogClass(Time=account.CheckfAccount[0].Time, AccountID=account.CheckofAccount[0].AccountID,
+                       Action=-account.CheckofAccount[0].Action, newValue=account.CheckofAccount[0].newValue,
+                       Type='CheckAccount')
+        session.add(log)
         session.delete(account.CheckofAccount[0].OpenofSCheck)
         session.delete(account.CheckofAccount[0])
     session.delete(account)
+
 
 
 def getLoan(session, clientid='', clientname='', bank=''):
