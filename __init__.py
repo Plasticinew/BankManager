@@ -33,7 +33,7 @@ def create_app(test_config=None):
 
     # apply the blueprints to the app
     from BankManager import bank, auth, staff, client, saveaccount, checkaccount,\
-        loan
+        loan, chart, link
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(bank.bp)
@@ -42,6 +42,8 @@ def create_app(test_config=None):
     app.register_blueprint(saveaccount.bp)
     app.register_blueprint(checkaccount.bp)
     app.register_blueprint(loan.bp)
+    app.register_blueprint(chart.bp)
+    app.register_blueprint(link.bp)
     # make url_for('index') == url_for('blog.index')
     # in another app, you might define a separate main index here with
     # app.route, while giving the blog blueprint a url_prefix, but for
