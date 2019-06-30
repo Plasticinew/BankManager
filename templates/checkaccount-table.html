@@ -7,7 +7,7 @@
     <div class="am-u-sm-12 am-u-md-4">
         <div class="am-btn-toolbar">
             <div class="am-btn-group am-btn-group-xs">
-                <a href="{{url_for('bank.addcheckaccount')}}">
+                <a href="{{url_for('checkaccount.addcheckaccount')}}">
                     <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
                         新增
                     </button>
@@ -27,7 +27,7 @@
             <label for="bankname">开户行</label>
             <input name="bankname" id="bankname" size="5">
             <label for="clientid">客户ID</label>
-            <input name="clientid" id="clientid" size="6">
+            <input name="clientid" id="clientid" size="10">
             <label for="clientname">客户姓名</label>
             <input name="clientname" id="clientname" size="6">
             <select name="way" data-am-selected="{btnSize: 'sm'}" size="6">
@@ -73,12 +73,12 @@
                     <td>
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
-                                <a href="{{url_for('bank.editcheckaccount',pk = dbank[0])}}"
+                                <a href="{{url_for('checkaccount.editcheckaccount',pk = dbank[0])}}"
                                    class="am-btn am-btn-xs am-text-secondary"><span
                                         class="am-icon-pencil-square-o"></span> 编辑
 
                                 </a>
-                                <a href="{{url_for('bank.delcheckaccount',pk = dbank[0])}}"
+                                <a href="{{url_for('checkaccount.delcheckaccount',pk = dbank[0])}}"
                                    class="am-btn am-btn-xs am-text-danger">
                                     <span class="am-icon-trash-o"></span> 删除
 
@@ -96,7 +96,7 @@
                 <div class="am-fr">
                     <ul class="am-pagination">
                         <li {% if page==0 %} class="am-disabled" {% endif %}><a
-                                href="{{url_for('bank.checkaccount',page = page-1)}}">«</a></li>
+                                href="{{url_for('checkaccount.checkaccount',page = page-1)}}">«</a></li>
 
                         {%if page<=2%}
                         {%set min=0%}
@@ -114,7 +114,7 @@
 
                                 {% for place in range(min,max) %}
                         <li {% if page==place %} class="am-active" {% endif %}><a
-                                href="{{url_for('bank.checkaccount',page = place)}}">{{place+1}}</a>
+                                href="{{url_for('checkaccount.checkaccount',page = place)}}">{{place+1}}</a>
                         </li>
                         {% endfor %}
                         {%if tot//10+1>min+5 %}
@@ -123,7 +123,7 @@
 
 
                         <li {% if page*10+10>tot %} class="am-disabled" {% endif %}><a
-                                href="{{url_for('bank.checkaccount',page = page+1)}}">»</a></li>
+                                href="{{url_for('checkaccount.checkaccount',page = page+1)}}">»</a></li>
                     </ul>
                 </div>
             </div>
