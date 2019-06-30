@@ -297,13 +297,12 @@ def addsaveaccount():
 
         return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.saveaccount", page=0),
                                message=None)
-    return render_template("edit.html", type=0)
+    return render_template("edit.html", type=0, show=1)
 
 
 @bp.route("/editsaveaccount<string:pk>", methods=('GET', 'POST'))
 def editsaveaccount(pk):
     if request.method == 'POST':
-        accountid = request.form['accountid']
         bankname = request.form['bankname']
         clientid = request.form['clientid']
         balance = request.form['balance']
@@ -352,13 +351,12 @@ def addcheckaccount():
 
         return render_template("success.html", action="添加", succ=1, showurl=url_for("bank.checkaccount", page=0),
                                message=None)
-    return render_template("edit.html", type=4)
+    return render_template("edit.html", type=4, show=1)
 
 
 @bp.route("/editcheckaccount<string:pk>", methods=('GET', 'POST'))
 def editcheckaccount(pk):
     if request.method == 'POST':
-        accountid = request.form['accountid']
         bankname = request.form['bankname']
         clientid = request.form['clientid']
         balance = request.form['balance']

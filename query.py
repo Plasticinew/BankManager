@@ -1,5 +1,6 @@
 import sqlalchemy as db
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey, null
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from BankManager.db import BankClass, StaffClass, LogClass,\
@@ -296,25 +297,25 @@ def delAccount(session, accountid):
 
 def getLoan(session, loanid='', clientid='', clientname='', bank=''):
     loanList=[]
-    namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%' + clientname + '%')).all()
-    for own, loan in session.query(OwningClass, LoanClass) \
+    # namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%' + clientname + '%')).all()
+    for loan, own, client in session.query(LoanClass,OwningClass,ClientClass)\
             .filter(OwningClass.ClientID.like('%' + clientid + '%'),
-                    OwningClass.LoanID == LoanClass.LoanID,
-                    OwningClass.LoanID.like('%'+loanid+'%'),
-                    OwningClass.ClientID.in_(namelist),
+                    LoanClass.LoanID.like('%'+loanid+'%'),
+                    ClientClass.ClientID == OwningClass.ClientID,
+                    LoanClass.LoanID == OwningClass.LoanID,
+                    ClientClass.ClientID.like('%'+clientname+'%'),
                     LoanClass.BankName.like('%' + bank + '%')) \
             .order_by(OwningClass.ClientID):
         sum = 0
         state = '未发放'
         for pay in loan.PayofLoan:
             sum = sum + pay.Amount
-        if(sum == loan.loanid.Amount):
+        if(sum == loan.Amount):
             state = '已全部发放'
         elif (sum > 0):
             state = '发放中'
-        loanList.append([loan.LoanID, loan.ClientID, loan.clientid[0].ClientName, loan.loanid.BankName, loan.loanid.Amount, state])
+        loanList.append([loan.LoanID, own.ClientID, client.ClientName, loan.BankName, loan.Amount, state])
     return loanList
-
 
 def getPay(session, loanid):
     payList = []
@@ -351,7 +352,26 @@ def addPay(session, payid, loanid, date, amount):
     session.add(pay)
 
 
-# def calculate(session):
+def calculate(session):
+    bank=[]
+    usercount=[]
+    checkwealth=[]
+    savewealth=[]
+    for bankname in session.query(BankClass):
+        bank.append(bankname)
+        usercount.append(len(session.query(OpenAccountClass).filter(OpenAccountClass.BankName==bankname).all()))
+        value = 0
+        for balance in session.query(CheckAccountClass, OpenAccountClass)\
+                .filter(OpenAccountClass.CheckAccountID == CheckAccountClass.AccountID,
+                        OpenAccountClass.BankName == bankname):
+            value = value+balance.Balance
+        checkwealth.append(value)
+        value = 0
+        for balance in session.query(SaveAccountClass, OpenAccountClass) \
+                .filter(OpenAccountClass.SaveAccountID == SaveAccountClass.AccountID,
+                        OpenAccountClass.BankName == bankname):
+            value = value + balance.Balance
+        savewealth.append(value)
 
 
 # if __name__ == '__main__':
