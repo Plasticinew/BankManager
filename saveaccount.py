@@ -24,7 +24,7 @@ def saveaccount(page=None):
         page = 0
 
     if request.method == 'POST':
-        accountid = request.form['accountid']
+        accountid = request.form['saveaccountid']
         bankname = request.form['bankname']
         clientid = request.form['clientid']
         clientname = request.form['clientname']

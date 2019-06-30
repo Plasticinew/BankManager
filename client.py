@@ -82,10 +82,14 @@ def addclient():
 
         if error is not None:
             print(error)
-            return flash(error, "增加客户", url_for("client.client", page=0))
+            return flash(error, "添加客户", url_for("client.client", page=0))
         else:
             with session_scope() as session:
-                newClient(session, clientid, clientname, phone, address)
+                try:
+                    newClient(session, clientid, clientname, phone, address)
+                except Exception as e:
+                    error = e.args[0]
+                    return flash(error, "添加客户", url_for("client.client", page=0))
 
             with session_scope() as session:
                 global cont
