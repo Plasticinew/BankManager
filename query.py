@@ -1,4 +1,6 @@
 import sqlalchemy as db
+from pandas import date_range
+import datetime
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey, null
 from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
@@ -372,6 +374,39 @@ def calculate(session):
                         OpenAccountClass.BankName == bankname):
             value = value + balance.Balance
         savewealth.append(value)
+    date=date_range('2015-02-01',datetime.date.today(),freq='MS')
+    usercount_detail=[]
+    checkwealth_detail=[]
+    savewealth_detail=[]
+    for bankname in session.query(BankClass):
+        u_detail=[]
+        c_detail=[]
+        s_detail=[]
+        ucount = 0
+        for month in date_range('2015-01-01', datetime.date.today(),freq='MS'):
+            date.append(month + slice)
+            slice = datetime.timedelta(month=1)
+            c_sum = 0
+            s_sum = 0
+            for log in session.query(LogClass).filter(LogClass.Bank == bankname, LogClass.Time > month,
+                                                      LogClass.Time < month + slice).order_by(LogClass.Time):
+                if(log.Action == log.newValue):
+                    ucount=ucount+1
+                if(log.Type == 'CheckAccount'):
+                    c_sum = c_sum + log.Action
+                if (log.Type == 'SaveAccount'):
+                    s_sum = s_sum + log.Action
+            u_detail.append(ucount)
+            c_detail.append(c_sum)
+            s_detail.append(s_sum)
+        usercount_detail.append(u_detail)
+        checkwealth_detail.append(c_detail)
+        savewealth_detail.append(s_detail)
+    '''银行列表，月份列表，
+    按银行排序：用户总量列表，支票账户总价值列表，储蓄账户总价值列表，
+    按银行排序并按月份排序：用户量详细列表，支票账户详细列表，储蓄账户详细列表'''
+    return bank, date, usercount, checkwealth, savewealth, usercount_detail, checkwealth_detail, savewealth_detail
+
 
 
 # if __name__ == '__main__':
