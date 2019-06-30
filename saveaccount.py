@@ -35,19 +35,18 @@ def saveaccount(page=None):
             with session_scope() as session:
                 cont = getSaveAccount(session, accountid=accountid, \
                                       clientid=clientid, clientname=clientname, \
-                                      bank=bankname)
+                                      bank=bankname, orderby="SaveAccountID")
         if waytosort == 'option2':
             with session_scope() as session:
                 cont = getSaveAccount(session, accountid=accountid, \
                                       clientid=clientid, clientname=clientname, \
                                       bank=bankname, orderby="ClientID")
         if waytosort == 'option3':
-            cont = []
-            # TODO:客户id
-            # with session_scope() as session:
-            #     cont = getSaveAccount(session, accountid=accountid, \
-            #                           clientid=clientid, clientname=clientname, \
-            #                           bank=bankname, orderby="ClientName")j
+            with session_scope() as session:
+                cont = getSaveAccount(session, accountid=accountid, \
+                                      clientid=clientid, clientname=clientname, \
+                                      bank=bankname)
+                cont = sorted(cont, key=lambda x: x[3])
 
     return render_template("saveaccount-table.html", page=page, cont=cont, tot=len(cont))
 
@@ -132,7 +131,7 @@ def editsaveaccount(pk):
 
         with session_scope() as session:
             if accountid:
-                error = "不允许修改账户ID！"
+                error = "不允许修改储蓄账户ID！"
                 return flash(error, "编辑储蓄账户", url_for("saveaccount.saveaccount", page=0))
 
             if bankname:
