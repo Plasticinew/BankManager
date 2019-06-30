@@ -210,7 +210,6 @@
         {%if type==3 %}
         <div class="am-tab-panel am-active">
             <form class="am-form" method="post">
-                {% if show==1%}
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
                         <label for="clientid">客户ID</label>
@@ -219,7 +218,6 @@
                         <input type="text" class="am-input-sm" name="clientid" id="clientid">
                     </div>
                 </div>
-                {%endif%}
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
                         <label for="clientname">客户姓名</label>
@@ -275,6 +273,7 @@
         {%if type==4 %}
         <div class="am-tab-panel am-active">
             <form class="am-form" method="post">
+                {% if show==1%}
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
                         <label for="accountid">账户ID</label>
@@ -283,6 +282,7 @@
                         <input type="text" class="am-input-sm" name="accountid" id="accountid">
                     </div>
                 </div>
+                {%endif%}
                 <div class="am-g am-margin-top-sm">
                     <div class="am-u-sm-4 am-u-md-2 am-text-right">
                         <label for="bankname">所在支行</label>
