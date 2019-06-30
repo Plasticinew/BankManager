@@ -3,14 +3,13 @@
 <small>Detail</small>{% endblock %}
 
 {% block body %}
-
-客户： {{namelist}}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;客户：{{namelist}}
 <hr>
 <div class="am-g">
-    <div class="am-u-sm-12 am-u-md-4">
+    <div class="am-u-sm-12 am-u-md-4">        
         <div class="am-btn-toolbar">
             <div class="am-btn-group am-btn-group-xs">
-                <a href="{{url_for('bank.addpay')}}">
+                <a href="{{url_for('loan.addpay')}}">
                     <button type="button" class="am-btn am-btn-default"><span class="am-icon-plus"></span>
                         新增
                     </button>
@@ -65,7 +64,7 @@
                     <td>
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
-                                <a href="{{url_for('bank.delpay',pk = dbank[0])}}"
+                                <a href="{{url_for('loan.delpay',pk = dbank[0])}}"
                                    class="am-btn am-btn-xs am-text-danger">
                                     <span class="am-icon-trash-o"></span> 删除
 
