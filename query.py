@@ -142,15 +142,15 @@ def delClient(session):
         raise Exception("ForeignKey constraint.")
 
 
-def getCheckAccount(session, accountid='', clientid='', clientname='', bank=''):
+def getCheckAccount(session, accountid='', clientid='', clientname='', bank='', orderby='ClientID'):
     checkaccountList=[]
-    namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
-    for account in session.query(OpenAccountClass)\
+    for account, client in session.query(OpenAccountClass, ClientClass)\
             .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'),
-                    OpenAccountClass.ClientID.in_(namelist),
+                    OpenAccountClass.ClientID == ClientClass.ClientID,
                     OpenAccountClass.CheckAccountID.like('%'+accountid+'%'),
-                    OpenAccountClass.BankName.like('%'+bank+'%'))\
-            .order_by(OpenAccountClass.ClientID):
+                    OpenAccountClass.BankName.like('%'+bank+'%'),
+                    ClientClass.ClientName.like('%' + clientname + '%'))\
+            .order_by(OpenAccountClass.__getattribute__(OpenAccountClass, orderby)):
         checkaccount = account.checkaccountid
         '''账户ID，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
         checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,checkaccount.clientid[0].ClientName,
@@ -165,7 +165,8 @@ def getSaveAccount(session, accountid='', clientid='', clientname='', bank='', o
             .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'),
                     OpenAccountClass.ClientID == ClientClass.ClientID,
                     OpenAccountClass.SaveAccountID.like('%' + accountid + '%'),
-                    OpenAccountClass.BankName.like('%'+bank+'%'))\
+                    OpenAccountClass.BankName.like('%'+bank+'%'),
+                    ClientClass.ClientName.like('%' + clientname + '%'))\
             .order_by(OpenAccountClass.__getattribute__(OpenAccountClass, orderby)):
         saveaccount = account.saveaccountid
         '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
