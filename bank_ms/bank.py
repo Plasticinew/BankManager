@@ -443,3 +443,20 @@ def addpay():
 def delpay(pk):
     return render_template("success.html", action="删除", succ=1, showurl=None, message=None)
 
+
+@bp.route("/chart", methods=('GET', 'POST'))
+def chart():
+    cont = []
+    if request.method == 'POST':
+        payid = request.form['payid']
+        loanid = request.form['loanid']
+        date = request.form['date']
+        amount = request.form['amount']
+        return render_template("success.html", action="添加", succ=1, showurl=None,
+                               message=None)
+    return render_template("chart.html", cont=cont)
+
+
+@bp.route("/link<string:name>", methods=('GET', 'POST'))
+def link(name):
+    return render_template("link.html", name=name)
