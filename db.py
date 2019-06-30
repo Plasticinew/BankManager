@@ -25,11 +25,11 @@ Base = declarative_base()
 class LogClass(Base):
     __tablename__ = 'Log'
 
-    Time = Column(DATE, nullable=False)
-    AccountID = Column(CHAR(18),ForeignKey(AccountCLass.AccountID))
+    logTime = Column(DATE, nullable=False)
+    AccountID = Column(CHAR(18),ForeignKey('Account.AccountID'))
     Action = Column(FLOAT, nullable=False)
     newValue = Column(FLOAT, nullable=False)
-    Type = Column(CHAR(18),nullable=False)
+    AccountType = Column(CHAR(18),nullable=False)
     accountid = relationship('AccountClass', backref='LogofAccount', foreign_keys=[AccountID])
 
 
