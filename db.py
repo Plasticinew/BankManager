@@ -26,10 +26,11 @@ class LogClass(Base):
     __tablename__ = 'Log'
 
     Time = Column(DATE, nullable=False)
-    ClientID = Column(CHAR(18),ForeignKey(Client.ClientID))
-    Action = Column(INT, nullable=False)
+    AccountID = Column(CHAR(18),ForeignKey(AccountCLass.AccountID))
+    Action = Column(FLOAT, nullable=False)
+    newValue = Column(FLOAT, nullable=False)
     Type = Column(CHAR(18),nullable=False)
-    clientid = relationship('ClientClass', backref='LogofClinet', foreign_keys=[ClientID])
+    accountid = relationship('AccountClass', backref='LogofAccount', foreign_keys=[AccountID])
 
 
 class BankClass(Base):
