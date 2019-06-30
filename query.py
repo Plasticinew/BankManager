@@ -210,7 +210,6 @@ def newCheckAccount(session, accountid, clientid, bank, balance, date, overdraft
         session.add(account)
     else:
         raise Exception("Account Id Exists")
-    print(bank)
     session.commit()
     openaccount=session.query(OpenAccountClass).filter(OpenAccountClass.BankName == bank,
                                            OpenAccountClass.ClientID == clientid).all()
@@ -249,13 +248,13 @@ def setAccount_others(session, accountid, new, attribute):
     account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
     if (len(account.CheckofAccount) != 0):
         if (attribute == 'BankName' or attribute == 'ClientID'):
-            account.OpenofCheck[0].__setattr__(attribute, new)
+            account.CheckofAccount[0].OpenofCheck[0].__setattr__(attribute, new)
         else:
             checkaccount = session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).first()
             checkaccount.__setattr__(attribute, new)
     if (len(account.SaveofAccount) != 0):
         if (attribute == 'BankName' or attribute == 'ClientID'):
-            account.OpenofSave[0].__setattr__(attribute, new)
+            account.SaveofAccount[0].OpenofSave[0].__setattr__(attribute, new)
         else:
             saveaccount = session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).first()
             saveaccount.__setattr__(attribute, new)
@@ -285,8 +284,9 @@ def delAccount(session, accountid):
         # session.delete(account.CheckofAccount[0].OpenofCheck[0])
 
     for openaccount in session.query(OpenAccountClass)\
-            .filter((OpenAccountClass.BankName, OpenAccountClass.ClientID) == pk):
-        if openaccount.SaveAccountID == null and openaccount.CheckAccountID == null:
+            .filter(OpenAccountClass.BankName == pk[0] and OpenAccountClass.ClientID == pk[1]):
+        if openaccount.SaveAccountID is None and openaccount.CheckAccountID is None:
+
             session.delete(openaccount)
 
     session.delete(account)
