@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="am-u-sm-12 am-u-sm-push-3">
-    <h2>{%if succ==1%}成功{{action}}{%else%}{{action}}失败<p>{{messege}}</p>{%endif%}</h2>
+    <h2>{%if succ==1%}成功{{action}}{%else%}{{action}}失败<hr><small><p>{{message}}</p></small>{%endif%}</h2>
     {%if showurl %}
     <div class="am-u-sm-12"></div>
     <div class="am-u-sm-12">

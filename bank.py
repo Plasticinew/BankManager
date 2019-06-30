@@ -1,6 +1,5 @@
 from flask import Blueprint
 from flask import request
-from flask import flash
 from flask import redirect
 from flask import url_for
 from flask import render_template
@@ -12,6 +11,7 @@ from BankManager.auth import login_required
 
 from BankManager.query import getBank, newBank, setBank, delBank
 
+from BankManager.error import flash
 with session_scope() as session:
     global cont
     cont = getBank(session)
@@ -53,12 +53,10 @@ def bank(page=None):
 @login_required
 def addbank():
     if request.method == 'POST':
-        print("hello")
         bankname = request.form["bankname"]
         city = request.form["bankcity"]
         property = request.form["property"]
         error = None
-        print([bankname, city, property])
         if bankname == '':
             error = "Bank Name is required."
 
@@ -69,8 +67,8 @@ def addbank():
             error = "Property is required."
 
         if error is not None:
-            print("error!")
-            flash(error)
+            print(error)
+            return flash(error, "增加支行", url_for("bank.bank", page=0))
         else:
             with session_scope() as session:
                 newBank(session, bankname, city, int(property))
@@ -89,7 +87,6 @@ def editbank(pk):
         city = request.form['bankcity']
         property = request.form['property']
         bankname = request.form['bankname']
-        print([pk, city, property])
 
         with session_scope() as session:
 

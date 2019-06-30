@@ -2,7 +2,8 @@ import sqlalchemy as db
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from BankManager.db import BankClass, StaffClass, LogClass
+from BankManager.db import BankClass, StaffClass, ClientClass
+    #LogClass
 # ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
 # SaveAccountClass, CheckAccountClass
 
@@ -134,7 +135,7 @@ def setClient(session, id, new, attribute):
         client.__setattr__(attribute, new)
 
 
-def delClient(session):
+def delClient(session, id):
     client = session.query(ClientClass).filter(ClientClass.ClientID == id).first()
     if (len(client.LinkofClient) == 0 ):
         session.delete(session.query(ClientClass).filter(ClientClass.ClientID == id).first())
