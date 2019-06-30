@@ -145,7 +145,11 @@ def editsaveaccount(pk):
                 setAccount_others(session, pk, clientid, "ClientID")
 
             if balance:
-                setAccount_balance(session, pk, balance, dateopening)
+                if dateopening:
+                    setAccount_balance(session, pk, float(balance), dateopening)
+                else:
+                    error = "Date is required!"
+                    return flash(error, "编辑储蓄账户", url_for("saveaccount.saveaccount", page=0))
 
             if dateopening:
                 setAccount_others(session, pk, dateopening, "DateOpening")
