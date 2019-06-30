@@ -160,16 +160,16 @@ def getCheckAccount(session, accountid='', clientid='', clientname='', bank=''):
 
 def getSaveAccount(session, accountid='', clientid='', clientname='', bank='', orderby='ClientID'):
     saveaccountList=[]
-    namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
-    for account in session.query(OpenAccountClass)\
+    # namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
+    for account, client in session.query(OpenAccountClass, ClientClass)\
             .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'),
-                    OpenAccountClass.ClientID.in_(namelist),
+                    OpenAccountClass.ClientID == ClientClass.ClientID,
                     OpenAccountClass.SaveAccountID.like('%' + accountid + '%'),
                     OpenAccountClass.BankName.like('%'+bank+'%'))\
             .order_by(OpenAccountClass.__getattribute__(OpenAccountClass, orderby)):
         saveaccount = account.saveaccountid
         '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
-        saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,saveaccount.clientid[0].ClientName,
+        saveaccountList.append([saveaccount.AccountID, account.BankName, account.ClientID, account.clientid.ClientName,
                           saveaccount.Balance, saveaccount.DateOpening, saveaccount.Rate, saveaccount.MoneyType])
     return saveaccountList
 
@@ -258,19 +258,19 @@ def setAccount_others(session, accountid, new, attribute):
 def delAccount(session, accountid):
     account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
     if (len(account.SaveofAccount) != 0):
-        log = LogClass(Time=account.SaveofAccount[0].Time, AccountID=account.SaveofAccount[0].AccountID,
-                       Action=-account.SaveofAccount[0].Action, newValue=account.SaveofAccount[0].newValue,
+        log = LogClass(Time=account.SaveofAccount.DateOpening, AccountID=account.SaveofAccount.AccountID,
+                       Action=-account.SaveofAccount.Balance, newValue=0,
                        Type='SaveAccount')
         session.add(log)
-        session.delete(account.SaveofAccount[0].OpenofSave)
-        session.delete(account.SaveofAccount[0])
+        session.delete(account.SaveofAccount.OpenofSave)
+        session.delete(account.SaveofAccount)
     if (len(account.CheckofAccount) != 0):
-        log = LogClass(Time=account.CheckfAccount[0].Time, AccountID=account.CheckofAccount[0].AccountID,
-                       Action=-account.CheckofAccount[0].Action, newValue=account.CheckofAccount[0].newValue,
+        log = LogClass(Time=account.CheckofAccount.DateOpening, AccountID=account.CheckofAccount.AccountID,
+                       Action=-account.CheckofAccount.Balance, newValue=0,
                        Type='CheckAccount')
         session.add(log)
-        session.delete(account.CheckofAccount[0].OpenofSCheck)
-        session.delete(account.CheckofAccount[0])
+        session.delete(account.CheckofAccount.OpenofSCheck)
+        session.delete(account.CheckofAccount)
     session.delete(account)
 
 
@@ -331,30 +331,31 @@ def addPay(session, payid, loanid, date, amount):
     session.add(pay)
 
 
-def calculate(session):
+# def calculate(session):
 
 
-if __name__ == '__main__':
-    #bank类的接口示例
-    engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
-    DBSession = sessionmaker(bind=engine)
-    Session = DBSession()
-    # newBank(Session, '合肥支行','合肥',114514)
-    # Session.commit()
-    # newClient(Session, '1234', 'pdd', '4321', '合肥')
-    # newClient(Session, '4396', 'clear', '7777', '上海')
-    # Session.commit()
-    # newCheckAccount(Session, '11111', '4396', '合肥支行', 7777, '2008-01-20', 6666)
-    # Session.commit()
-    # newCheckAccount(Session, '22222', '1234', '合肥支行', 7776, '2008-01-22', 6666)
-    # Session.commit()
-    # newSaveAccount(Session, '33333', '4396', '合肥支行', 77778, '2009-01-20', 6666, 'RMB')
-    # Session.commit()
-    # newStaff(Session, 'ba', '合肥支行', 'ab', '4321', '合肥', '2000-12-11')
-    # newStaff(Session, 'ab', '合肥支行', 'ba', '1234', '合肥', '1999-12-11')
-    # Session.commit()
-    # print(getStaff(session=Session, orderby='StaffID'))
-    # print(getStaff(session=Session, orderby='StaffName'))
-    # newLoan(session=Session, loanid='12345',clientidlist=['4396','1234'],bank='合肥支行',amount=114514)
-    # addPay(session=Session, payid='123',loanid='12345',date='1999-12-21',amount=1234)
-    # Session.commit()
+# if __name__ == '__main__':
+#     #bank类的接口示例
+#     engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
+#     DBSession = sessionmaker(bind=engine)
+#     Session = DBSession()
+#     newBank(Session, '合肥支行','合肥',114514)
+#     Session.commit()
+#     newClient(Session, '1234', 'pdd', '4321', '合肥')
+#     newClient(Session, '4396', 'clear', '7777', '上海')
+#     Session.commit()
+#     newCheckAccount(Session, '11111', '4396', '合肥支行', 7777, '2008-01-20', 6666)
+#     Session.commit()
+#     newCheckAccount(Session, '22222', '1234', '合肥支行', 7776, '2008-01-22', 6666)
+#     Session.commit()
+#     newSaveAccount(Session, '33333', '4396', '合肥支行', 77778, '2009-01-20', 6666, 'RMB')
+#     Session.commit()
+#     newStaff(Session, 'ba', '合肥支行', 'ab', '4321', '合肥', '2000-12-11')
+#     newStaff(Session, 'ab', '合肥支行', 'ba', '1234', '合肥', '1999-12-11')
+#     Session.commit()
+#     print(getStaff(session=Session, orderby='StaffID'))
+#     print(getStaff(session=Session, orderby='StaffName'))
+#     newLoan(session=Session, loanid='12345',clientidlist=['4396','1234'],bank='合肥支行',amount=114514)
+#     addPay(session=Session, payid='123',loanid='12345',date='1999-12-21',amount=1234)
+#     Session.commit()
+
