@@ -320,7 +320,7 @@ def getLoan(session, loanid='', clientid='', clientname='', bank=''):
 def getPay(session, loanid):
     payList = []
     for pay in session.query(PayLoanClass)\
-            .filter(PayLoanClass.LoanID.like('%'+loanid+'%'))\
+            .filter(PayLoanClass.LoanID.like('%' + str(loanid) + '%'))\
             .order_by(PayLoanClass.Date):
         payList.append([pay.PayID, pay.Date, pay.Amount])
     return payList
