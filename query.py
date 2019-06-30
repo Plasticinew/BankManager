@@ -2,10 +2,9 @@ import sqlalchemy as db
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from BankManager.db import BankClass, StaffClass, ClientClass
-    #LogClass
-# ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
-# SaveAccountClass, CheckAccountClass
+from BankManager.db import BankClass, StaffClass, LogClass,\
+ ClientClass, AccountClass, PersonInChargeClass, OpenAccountClass, OwningClass, LoanClass, PayLoanClass, \
+ SaveAccountClass, CheckAccountClass
 
 
 
@@ -135,7 +134,7 @@ def setClient(session, id, new, attribute):
         client.__setattr__(attribute, new)
 
 
-def delClient(session, id):
+def delClient(session):
     client = session.query(ClientClass).filter(ClientClass.ClientID == id).first()
     if (len(client.LinkofClient) == 0 ):
         session.delete(session.query(ClientClass).filter(ClientClass.ClientID == id).first())
@@ -143,28 +142,34 @@ def delClient(session, id):
         raise Exception("ForeignKey constraint.")
 
 
-def getCheckAccount(session, clientid='', clientname='', bank=''):
+def getCheckAccount(session, accountid='', clientid='', clientname='', bank=''):
     checkaccountList=[]
     namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
     for account in session.query(OpenAccountClass)\
-            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.ClientID.in_(namelist), OpenAccountClass.BankName.like('%'+bank+'%'))\
+            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'),
+                    OpenAccountClass.ClientID.in_(namelist),
+                    OpenAccountClass.CheckAccountID.like('%'+accountid+'%'),
+                    OpenAccountClass.BankName.like('%'+bank+'%'))\
             .order_by(OpenAccountClass.ClientID):
         checkaccount = account.checkaccountid
         '''账户ID，账户所在银行，账户持有人ID，账户余额，账户开设时间，账户透支额'''
-        checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,
+        checkaccountList.append([checkaccount.AccountID, checkaccount.BankName, checkaccount.ClientID,checkaccount.clientid[0].ClientName,
                           checkaccount.Balance, checkaccount.DateOpening, checkaccount.Overdraft])
     return checkaccountList
 
 
-def getSaveAccount(session, clientid='', clientname='', bank=''):
+def getSaveAccount(session, accountid='', clientid='', clientname='', bank=''):
     saveaccountList=[]
     namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
     for account in session.query(OpenAccountClass)\
-            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'), OpenAccountClass.ClientID.in_(namelist), OpenAccountClass.BankName.like('%'+bank+'%'))\
+            .filter(OpenAccountClass.ClientID.like('%'+clientid+'%'),
+                    OpenAccountClass.ClientID.in_(namelist),
+                    OpenAccountClass.SaveAccountID.like('%' + accountid + '%'),
+                    OpenAccountClass.BankName.like('%'+bank+'%'))\
             .order_by(OpenAccountClass.ClientID):
         saveaccount = account.saveaccountid
         '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
-        saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,
+        saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,saveaccount.clientid[0].ClientName,
                           saveaccount.Balance, saveaccount.DateOpening, saveaccount.Rate, saveaccount.MoneyType])
     return saveaccountList
 
@@ -270,11 +275,12 @@ def delAccount(session, accountid):
 
 
 
-def getLoan(session, clientid='', clientname='', bank=''):
+def getLoan(session, loanid='', clientid='', clientname='', bank=''):
     loanList=[]
     namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%' + clientname + '%')).all()
     for loan in session.query(OwningClass,LoanClass) \
             .filter(OwningClass.ClientID.like('%' + clientid + '%'),
+                    OwningClass.LoanID.like('%'+loanid+'%'),
                     OwningClass.ClientID.in_(namelist),
                     OwningClass.loanid.BankName.like('%' + bank + '%')) \
             .order_by(OwningClass.ClientID):
@@ -286,7 +292,7 @@ def getLoan(session, clientid='', clientname='', bank=''):
             state = '已全部发放'
         elif (sum > 0):
             state = '发放中'
-        loanList.append([loan.LoanID, loan.ClientID, loan.loanid.BankName, loan.loanid.Amount, state])
+        loanList.append([loan.LoanID, loan.ClientID, loan.clientid[0].ClientName, loan.loanid.BankName, loan.loanid.Amount, state])
     return loanList
 
 
@@ -349,6 +355,6 @@ if __name__ == '__main__':
     # Session.commit()
     # print(getStaff(session=Session, orderby='StaffID'))
     # print(getStaff(session=Session, orderby='StaffName'))
-    newLoan(session=Session, loanid='12345',clientidlist=['4396','1234'],bank='合肥支行',amount=114514)
-    addPay(session=Session, payid='123',loanid='12345',date='1999-12-21',amount=1234)
-    Session.commit()
+    # newLoan(session=Session, loanid='12345',clientidlist=['4396','1234'],bank='合肥支行',amount=114514)
+    # addPay(session=Session, payid='123',loanid='12345',date='1999-12-21',amount=1234)
+    # Session.commit()
