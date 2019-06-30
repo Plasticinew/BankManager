@@ -296,11 +296,12 @@ def delAccount(session, accountid):
 def getLoan(session, loanid='', clientid='', clientname='', bank=''):
     loanList=[]
     namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%' + clientname + '%')).all()
-    for loan in session.query(OwningClass,LoanClass) \
+    for own, loan in session.query(OwningClass, LoanClass) \
             .filter(OwningClass.ClientID.like('%' + clientid + '%'),
+                    OwningClass.LoanID == LoanClass.LoanID,
                     OwningClass.LoanID.like('%'+loanid+'%'),
                     OwningClass.ClientID.in_(namelist),
-                    OwningClass.loanid.BankName.like('%' + bank + '%')) \
+                    LoanClass.BankName.like('%' + bank + '%')) \
             .order_by(OwningClass.ClientID):
         sum = 0
         state = '未发放'
