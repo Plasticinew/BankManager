@@ -248,11 +248,17 @@ def setAccount_balance(session, accountid, balance, date):
 def setAccount_others(session, accountid, new, attribute):
     account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
     if (len(account.CheckofAccount) != 0):
-        checkaccount = session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).first()
-        checkaccount.__setattr__(attribute, new)
+        if (attribute == 'BankName' or attribute == 'ClientID'):
+            account.OpenofCheck[0].__setattr__(attribute, new)
+        else:
+            checkaccount = session.query(CheckAccountClass).filter(CheckAccountClass.AccountID == accountid).first()
+            checkaccount.__setattr__(attribute, new)
     if (len(account.SaveofAccount) != 0):
-        saveaccount = session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).first()
-        saveaccount.__setattr__(attribute, new)
+        if (attribute == 'BankName' or attribute == 'ClientID'):
+            account.OpenofSave[0].__setattr__(attribute, new)
+        else:
+            saveaccount = session.query(SaveAccountClass).filter(SaveAccountClass.AccountID == accountid).first()
+            saveaccount.__setattr__(attribute, new)
 
 
 def delAccount(session, accountid):
