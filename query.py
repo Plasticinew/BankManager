@@ -1,4 +1,5 @@
 import sqlalchemy as db
+import matplotlib.pyplot as plt
 from pandas import date_range
 import datetime
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey, null
@@ -374,16 +375,16 @@ def calculate(session):
                         OpenAccountClass.BankName == bankname):
             value = value + balance.Balance
         savewealth.append(value)
-    date=date_range('2015-02-01',datetime.date.today(),freq='MS')
-    usercount_detail=[]
-    checkwealth_detail=[]
-    savewealth_detail=[]
+    date = date_range('2015-02-01', datetime.date.today(), freq='MS')
+    usercount_detail = []
+    checkwealth_detail = []
+    savewealth_detail = []
     for bankname in session.query(BankClass):
-        u_detail=[]
-        c_detail=[]
-        s_detail=[]
+        u_detail = []
+        c_detail = []
+        s_detail = []
         ucount = 0
-        for month in date_range('2015-01-01', datetime.date.today(),freq='MS'):
+        for month in date_range('2015-01-01', datetime.date.today(), freq='MS'):
             date.append(month + slice)
             slice = datetime.timedelta(month=1)
             c_sum = 0
@@ -405,11 +406,156 @@ def calculate(session):
     '''银行列表，月份列表，
     按银行排序：用户总量列表，支票账户总价值列表，储蓄账户总价值列表，
     按银行排序并按月份排序：用户量详细列表，支票账户详细列表，储蓄账户详细列表'''
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.pie(usercount,labels=bank)
+    plt.title('用户比例统计')
+    plt.savefig('static/usercount.png',format='png')
+    plt.close()
+    plt.pie(checkwealth,labels=bank)
+    plt.title('支票账户比例统计')
+    plt.savefig('static/check.png', format='png')
+    plt.close()
+    plt.pie(savewealth, labels=bank)
+    plt.title('储蓄账户比例统计')
+    plt.savefig('static/save.png', format='png')
+    plt.close()
+    for i in len(bank):
+        plt.plot(date,usercount_detail[i],label=bank[i])
+    plt.xlabel('月')
+    plt.ylabel('用户数量')
+    plt.title('逐月用户数量统计')
+    plt.savefig('static/user_detail.png', format='png')
+    for i in len(bank):
+        plt.plot(date,checkwealth_detail[i],label=bank[i])
+    plt.xlabel('月')
+    plt.ylabel('支票账户总额度')
+    plt.title('逐月支票账户总额度统计')
+    plt.savefig('static/check_detail.png', format='png')
+    for i in len(bank):
+        plt.plot(date, savewealth_detail[i], label=bank[i])
+    plt.xlabel('月')
+    plt.ylabel('储蓄账户总额度')
+    plt.title('逐月储蓄账户总额度统计')
+    plt.savefig('static/save_detail.png', format='png')
+    for i in len(bank):
+        new_user=[]
+        new_index=[]
+        count = 0
+        user = 0
+        index = 0
+        for j in date:
+            user = user + usercount_detail[i][j]
+            if count == 3:
+                new_user.append(user)
+                new_index.append(index)
+                count = 0
+                user = 0
+                index=index+ 1
+        plt.plot(index,new_user,label=bank[i])
+    plt.xlabel('季度')
+    plt.ylabel('用户数量')
+    plt.title('逐季度用户数量统计')
+    plt.savefig('static/user_detail_4.png', format='png')
+    for i in len(bank):
+        new_user = []
+        new_index = []
+        count = 0
+        user = 0
+        index = 0
+        for j in date:
+            user = user + checkwealth_detail[i][j]
+            if count == 3:
+                new_user.append(user)
+                new_index.append(index)
+                count = 0
+                user = 0
+                index = index + 1
+        plt.plot(index, new_user, label=bank[i])
+    plt.xlabel('季度')
+    plt.ylabel('支票账户总额度')
+    plt.title('逐季度支票账户总额度统计')
+    plt.savefig('static/check_detail_4.png', format='png')
+    for i in len(bank):
+        new_user = []
+        new_index = []
+        count = 0
+        user = 0
+        index = 0
+        for j in date:
+            user = user + savewealth_detail[i][j]
+            if count == 3:
+                new_user.append(user)
+                new_index.append(index)
+                count = 0
+                user = 0
+                index = index + 1
+        plt.plot(index, new_user, label=bank[i])
+    plt.xlabel('季度')
+    plt.ylabel('储蓄账户总额度')
+    plt.title('逐季度储蓄账户总额度统计')
+    plt.savefig('static/save_detail_4.png', format='png')
+    for i in len(bank):
+        new_user=[]
+        new_index=[]
+        count = 0
+        user = 0
+        index = 0
+        for j in date:
+            user = user + usercount_detail[i][j]
+            if count == 11:
+                new_user.append(user)
+                new_index.append(index)
+                count = 0
+                user = 0
+                index=index+ 1
+        plt.plot(index,new_user,label=bank[i])
+    plt.xlabel('年度')
+    plt.ylabel('用户数量')
+    plt.title('逐年度用户数量统计')
+    plt.savefig('static/user_detail_12.png', format='png')
+    for i in len(bank):
+        new_user = []
+        new_index = []
+        count = 0
+        user = 0
+        index = 0
+        for j in date:
+            user = user + checkwealth_detail[i][j]
+            if count == 11:
+                new_user.append(user)
+                new_index.append(index)
+                count = 0
+                user = 0
+                index = index + 1
+        plt.plot(index, new_user, label=bank[i])
+    plt.xlabel('年度')
+    plt.ylabel('支票账户总额度')
+    plt.title('逐年度支票账户总额度统计')
+    plt.savefig('static/check_detail_12.png', format='png')
+    for i in len(bank):
+        new_user = []
+        new_index = []
+        count = 0
+        user = 0
+        index = 0
+        for j in date:
+            user = user + savewealth_detail[i][j]
+            if count == 11:
+                new_user.append(user)
+                new_index.append(index)
+                count = 0
+                user = 0
+                index = index + 1
+        plt.plot(index, new_user, label=bank[i])
+    plt.xlabel('年度')
+    plt.ylabel('储蓄账户总额度')
+    plt.title('逐年度储蓄账户总额度统计')
+    plt.savefig('static/save_detail_12.png', format='png')
     return bank, date, usercount, checkwealth, savewealth, usercount_detail, checkwealth_detail, savewealth_detail
 
 
 
-# if __name__ == '__main__':
+ if __name__ == '__main__':
 #     #bank类的接口示例
 #     engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
 #     DBSession = sessionmaker(bind=engine)
@@ -433,4 +579,5 @@ def calculate(session):
 #     newLoan(session=Session, loanid='12345',clientidlist=['4396','1234'],bank='合肥支行',amount=114514)
 #     addPay(session=Session, payid='123',loanid='12345',date='1999-12-21',amount=1234)
 #     Session.commit()
+
 
