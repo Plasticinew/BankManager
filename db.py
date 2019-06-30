@@ -95,7 +95,7 @@ class OwningClass(Base):
 
     ClientID = Column(CHAR(18), ForeignKey('Client.ClientID'), primary_key=True)
     LoanID = Column(CHAR(18), ForeignKey('Loan.LoanID'), primary_key=True)
-    clientid = relationship('ClientClass', backref='OwnofClinet', foreign_keys=[ClientID])
+    clientid = relationship('ClientClass', backref='OwnofClient', foreign_keys=[ClientID])
     loanid = relationship('LoanClass', backref='OwnofLoan', foreign_keys=[LoanID])
 
 
