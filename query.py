@@ -102,7 +102,7 @@ def getClient(session, id='', name='', phone='', address= '', orderby='ClientID'
             .filter(ClientClass.ClientID.like('%'+id+'%'),
                     ClientClass.ClientName.like('%'+name+'%'),
                     ClientClass.Phone.like('%'+phone+'%'),
-                    ClientClass.Address.like('%'+address+'%'))\
+                    ClientClass.Address.like('%'+address+'%')) \
             .order_by(ClientClass.__getattribute__(ClientClass, orderby)):
         linkname=''
         for i in client.LinkofClient:
@@ -158,7 +158,7 @@ def getCheckAccount(session, accountid='', clientid='', clientname='', bank=''):
     return checkaccountList
 
 
-def getSaveAccount(session, accountid='', clientid='', clientname='', bank=''):
+def getSaveAccount(session, accountid='', clientid='', clientname='', bank='', orderby='ClientID'):
     saveaccountList=[]
     namelist = session.query(ClientClass.ClientID).filter(ClientClass.ClientName.like('%'+clientname+'%')).all()
     for account in session.query(OpenAccountClass)\
@@ -166,7 +166,7 @@ def getSaveAccount(session, accountid='', clientid='', clientname='', bank=''):
                     OpenAccountClass.ClientID.in_(namelist),
                     OpenAccountClass.SaveAccountID.like('%' + accountid + '%'),
                     OpenAccountClass.BankName.like('%'+bank+'%'))\
-            .order_by(OpenAccountClass.ClientID):
+            .order_by(OpenAccountClass.__getattribute__(OpenAccountClass, orderby)):
         saveaccount = account.saveaccountid
         '''账户ID，账户类型，账户所在银行，账户持有人ID，账户余额，账户开设时间，汇率，货币类型'''
         saveaccountList.append([saveaccount.AccountID, saveaccount.BankName, saveaccount.ClientID,saveaccount.clientid[0].ClientName,
