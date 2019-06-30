@@ -579,7 +579,7 @@ def calculate(session):
 
 
 
- if __name__ == '__main__':
+#if __name__ == '__main__':
 #     #bank类的接口示例
 #     engine = db.create_engine('mysql+mysqlconnector://root:2161815@localhost:3306/test')
 #     DBSession = sessionmaker(bind=engine)
