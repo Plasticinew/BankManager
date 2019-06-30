@@ -1,5 +1,5 @@
 import sqlalchemy as db
-from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey
+from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey, null
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from BankManager.db import BankClass, StaffClass, LogClass,\
@@ -258,19 +258,31 @@ def setAccount_others(session, accountid, new, attribute):
 def delAccount(session, accountid):
     account = session.query(AccountClass).filter(AccountClass.AccountID == accountid).first()
     if (len(account.SaveofAccount) != 0):
-        log = LogClass(Time=account.SaveofAccount.DateOpening, AccountID=account.SaveofAccount.AccountID,
-                       Action=-account.SaveofAccount.Balance, newValue=0,
+        log = LogClass(Time=account.SaveofAccount[0].DateOpening, AccountID=account.SaveofAccount[0].AccountID,
+                       Action=-account.SaveofAccount[0].Balance, newValue=0,
                        Type='SaveAccount')
         session.add(log)
-        session.delete(account.SaveofAccount.OpenofSave)
-        session.delete(account.SaveofAccount)
+        pk = (account.SaveofAccount[0].OpenofSave[0].BankName, \
+              account.SaveofAccount[0].OpenofSave[0].ClientID)
+        session.delete(account.SaveofAccount[0])
+        session.commit()
+        # session.delete(account.SaveofAccount[0].OpenofSave[0])
     if (len(account.CheckofAccount) != 0):
-        log = LogClass(Time=account.CheckofAccount.DateOpening, AccountID=account.CheckofAccount.AccountID,
-                       Action=-account.CheckofAccount.Balance, newValue=0,
+        log = LogClass(Time=account.CheckofAccount[0].DateOpening, AccountID=account.CheckofAccount[0].AccountID,
+                       Action=-account.CheckofAccount[0].Balance, newValue=0,
                        Type='CheckAccount')
         session.add(log)
-        session.delete(account.CheckofAccount.OpenofSCheck)
+        pk = (account.CheckofAccount[0].OpenofCheck[0].BankName, \
+              account.CheckofAccount[0].OpenofCheck[0].ClientID)
         session.delete(account.CheckofAccount)
+        session.commit()
+        # session.delete(account.CheckofAccount[0].OpenofCheck[0])
+
+    for openaccount in session.query(OpenAccountClass)\
+            .filter((OpenAccountClass.BankName, OpenAccountClass.ClientID) == pk):
+        if openaccount.SaveAccountID == null and openaccount.CheckAccountID == null:
+            session.delete(openaccount)
+
     session.delete(account)
 
 
