@@ -419,25 +419,25 @@ def calculate(session):
     plt.title('储蓄账户比例统计')
     plt.savefig('static/save.png', format='png')
     plt.close()
-    for i in len(bank):
+    for i in range(len(bank)):
         plt.plot(date,usercount_detail[i],label=bank[i])
     plt.xlabel('月')
     plt.ylabel('用户数量')
     plt.title('逐月用户数量统计')
     plt.savefig('static/user_detail.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         plt.plot(date,checkwealth_detail[i],label=bank[i])
     plt.xlabel('月')
     plt.ylabel('支票账户总额度')
     plt.title('逐月支票账户总额度统计')
     plt.savefig('static/check_detail.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         plt.plot(date, savewealth_detail[i], label=bank[i])
     plt.xlabel('月')
     plt.ylabel('储蓄账户总额度')
     plt.title('逐月储蓄账户总额度统计')
     plt.savefig('static/save_detail.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         new_user=[]
         new_index=[]
         count = 0
@@ -456,7 +456,7 @@ def calculate(session):
     plt.ylabel('用户数量')
     plt.title('逐季度用户数量统计')
     plt.savefig('static/user_detail_4.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         new_user = []
         new_index = []
         count = 0
@@ -475,7 +475,7 @@ def calculate(session):
     plt.ylabel('支票账户总额度')
     plt.title('逐季度支票账户总额度统计')
     plt.savefig('static/check_detail_4.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         new_user = []
         new_index = []
         count = 0
@@ -494,7 +494,7 @@ def calculate(session):
     plt.ylabel('储蓄账户总额度')
     plt.title('逐季度储蓄账户总额度统计')
     plt.savefig('static/save_detail_4.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         new_user=[]
         new_index=[]
         count = 0
@@ -513,7 +513,7 @@ def calculate(session):
     plt.ylabel('用户数量')
     plt.title('逐年度用户数量统计')
     plt.savefig('static/user_detail_12.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         new_user = []
         new_index = []
         count = 0
@@ -532,7 +532,7 @@ def calculate(session):
     plt.ylabel('支票账户总额度')
     plt.title('逐年度支票账户总额度统计')
     plt.savefig('static/check_detail_12.png', format='png')
-    for i in len(bank):
+    for i in range(len(bank)):
         new_user = []
         new_index = []
         count = 0
