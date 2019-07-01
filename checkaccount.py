@@ -36,7 +36,7 @@ def checkaccount(page=None):
 
         if waytosort == 'option1':
             with session_scope() as session:
-                cont = getCheckAccount(session, accountid=account,\
+                cont = getCheckAccount(session, accountid=accountid,\
                        clientid=clientid, clientname=clientname, bank=bankname, orderby="CheckAccountID")
 
         if waytosort == 'option2':
@@ -116,7 +116,7 @@ def addcheckaccount():
 @login_required
 def editcheckaccount(pk):
     if request.method == 'POST':
-        accountid = request.form['accountid']
+        # accountid = request.form['accountid']
         bankname = request.form['bankname']
         clientid = request.form['clientid']
         balance = request.form['balance']
@@ -124,10 +124,6 @@ def editcheckaccount(pk):
         overdraft = request.form['overdraft']
 
         with session_scope() as session:
-
-            if accountid:
-                error = "不允许修改支票账户ID!"
-                return flash(error, "修改支票账户", url_for("checkaccount.checkaccount", page=0))
 
             if bankname:
                 setAccount_others(session, pk, bankname, "BankName")

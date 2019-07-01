@@ -1,6 +1,7 @@
 import sqlalchemy as db
 import matplotlib.pyplot as plt
 from pandas import date_range
+from pandas import to_datetime
 import datetime
 from sqlalchemy import Column, CHAR, FLOAT, DATE, ForeignKey, null
 from sqlalchemy import func
@@ -361,36 +362,39 @@ def calculate(session):
     checkwealth=[]
     savewealth=[]
     for bankname in session.query(BankClass):
+        bankname = bankname.BankName
         bank.append(bankname)
         usercount.append(len(session.query(OpenAccountClass).filter(OpenAccountClass.BankName==bankname).all()))
         value = 0
-        for balance in session.query(CheckAccountClass, OpenAccountClass)\
+        for checkaccount, openaccount in session.query(CheckAccountClass, OpenAccountClass)\
                 .filter(OpenAccountClass.CheckAccountID == CheckAccountClass.AccountID,
                         OpenAccountClass.BankName == bankname):
-            value = value+balance.Balance
+            value = value + checkaccount.Balance
         checkwealth.append(value)
         value = 0
-        for balance in session.query(SaveAccountClass, OpenAccountClass) \
+        for saveaccount, openaccount in session.query(SaveAccountClass, OpenAccountClass) \
                 .filter(OpenAccountClass.SaveAccountID == SaveAccountClass.AccountID,
                         OpenAccountClass.BankName == bankname):
-            value = value + balance.Balance
+            value = value + saveaccount.Balance
         savewealth.append(value)
-    date = date_range('2015-02-01', datetime.date.today(), freq='MS')
+    date = date_range('2015-01-01', datetime.date.today(), freq='MS')
     usercount_detail = []
     checkwealth_detail = []
     savewealth_detail = []
     for bankname in session.query(BankClass):
+        bankname = bankname.BankName
         u_detail = []
         c_detail = []
         s_detail = []
         ucount = 0
+        slice = date[1] - date[0]
         for month in date_range('2015-01-01', datetime.date.today(), freq='MS'):
-            date.append(month + slice)
-            slice = datetime.timedelta(month=1)
+            # slice = datetime.timedelta(days=30)
             c_sum = 0
             s_sum = 0
-            for log in session.query(LogClass).filter(LogClass.Bank == bankname, LogClass.Time > month,
-                                                      LogClass.Time < month + slice).order_by(LogClass.Time):
+
+            for log in session.query(LogClass).filter(LogClass.Bank == bankname, LogClass.Time > month.to_pydatetime().date(),
+                                                      LogClass.Time < (month + slice).to_pydatetime().date()).order_by(LogClass.Time):
                 if(log.Action == log.newValue):
                     ucount=ucount+1
                 if(log.Type == 'CheckAccount'):
@@ -406,42 +410,42 @@ def calculate(session):
     '''银行列表，月份列表，
     按银行排序：用户总量列表，支票账户总价值列表，储蓄账户总价值列表，
     按银行排序并按月份排序：用户量详细列表，支票账户详细列表，储蓄账户详细列表'''
-    plt.rcParams['font.sans-serif'] = ['SimHei']
+    # plt.rcParams['font.sans-serif'] = ['FangSong']
     plt.pie(usercount, labels=bank)
-    plt.title('用户比例统计')
-    plt.savefig('static/usercount.png', format='png')
+    plt.title('User Proportion')
+    plt.savefig('BankManager/static/usercount.png', format='png')
     plt.close()
     plt.pie(checkwealth, labels=bank)
-    plt.title('支票账户比例统计')
-    plt.savefig('static/check.png', format='png')
+    plt.title('Check Account Proportion')
+    plt.savefig('BankManager/static/check.png', format='png')
     plt.close()
     plt.pie(savewealth, labels=bank)
-    plt.title('储蓄账户比例统计')
-    plt.savefig('static/save.png', format='png')
+    plt.title('Saving Account Proportion')
+    plt.savefig('BankManager/static/save.png', format='png')
     plt.close()
     for i in range(len(bank)):
         plt.plot(date, usercount_detail[i], label=str(bank[i]))
-    plt.xlabel('月')
-    plt.ylabel('用户数量')
-    plt.title('逐月用户数量统计')
+    plt.xlabel('Month')
+    plt.ylabel('User Count')
+    plt.title('User Count Per Month')
     plt.legend(loc='upper left')
-    plt.savefig('static/user_detail.png', format='png')
+    plt.savefig('BankManager/static/user_detail.png', format='png')
     plt.close()
     for i in range(len(bank)):
         plt.plot(date, checkwealth_detail[i], label=str(bank[i]))
-    plt.xlabel('月')
-    plt.ylabel('支票账户总额度')
-    plt.title('逐月支票账户总额度统计')
+    plt.xlabel('Month')
+    plt.ylabel('Check Account Total')
+    plt.title('Check Account Total Per Month')
     plt.legend(loc='upper left')
-    plt.savefig('static/check_detail.png', format='png')
+    plt.savefig('BankManager/static/check_detail.png', format='png')
     plt.close()
     for i in range(len(bank)):
         plt.plot(date, savewealth_detail[i], label=str(bank[i]))
-    plt.xlabel('月')
-    plt.ylabel('储蓄账户总额度')
-    plt.title('逐月储蓄账户总额度统计')
+    plt.xlabel('Month')
+    plt.ylabel('Saving Account Total')
+    plt.title('Saving Account Total Per Month')
     plt.legend(loc='upper left')
-    plt.savefig('static/save_detail.png', format='png')
+    plt.savefig('BankManager/static/save_detail.png', format='png')
     plt.close()
     for i in range(len(bank)):
         new_user = []
@@ -459,11 +463,11 @@ def calculate(session):
                 user = 0
                 index = index + 1
         plt.plot(new_index, new_user, label=str(bank[i]))
-    plt.xlabel('季度')
-    plt.ylabel('用户数量')
-    plt.title('逐季度用户数量统计')
+    plt.xlabel('Season')
+    plt.ylabel('User Count')
+    plt.title('User Count Per Season')
     plt.legend(loc='upper left')
-    plt.savefig('static/user_detail_4.png', format='png')
+    plt.savefig('BankManager/static/user_detail_4.png', format='png')
     plt.close()
     for i in range(len(bank)):
         new_user = []
@@ -481,11 +485,11 @@ def calculate(session):
                 user = 0
                 index = index + 1
         plt.plot(new_index, new_user, label=str(bank[i]))
-    plt.xlabel('季度')
-    plt.ylabel('支票账户总额度')
-    plt.title('逐季度支票账户总额度统计')
+    plt.xlabel('Season')
+    plt.ylabel('Check Account Total')
+    plt.title('Check Account Total Per Season')
     plt.legend(loc='upper left')
-    plt.savefig('static/check_detail_4.png', format='png')
+    plt.savefig('BankManager/static/check_detail_4.png', format='png')
     plt.close()
     for i in range(len(bank)):
         new_user = []
@@ -503,11 +507,11 @@ def calculate(session):
                 user = 0
                 index = index + 1
         plt.plot(new_index, new_user, label=str(bank[i]))
-    plt.xlabel('季度')
-    plt.ylabel('储蓄账户总额度')
-    plt.title('逐季度储蓄账户总额度统计')
+    plt.xlabel('Season')
+    plt.ylabel('Saving Account Total')
+    plt.title('Saving Account Total Per Season')
     plt.legend(loc='upper left')
-    plt.savefig('static/save_detail_4.png', format='png')
+    plt.savefig('BankManager/static/save_detail_4.png', format='png')
     plt.close()
     for i in range(len(bank)):
         new_user = []
@@ -525,11 +529,11 @@ def calculate(session):
                 user = 0
                 index = index + 1
         plt.plot(new_index, new_user, label=str(bank[i]))
-    plt.xlabel('年度')
-    plt.ylabel('用户数量')
-    plt.title('逐年度用户数量统计')
+    plt.xlabel('Year')
+    plt.ylabel('User Count')
+    plt.title('User Count Per Year')
     plt.legend(loc='upper left')
-    plt.savefig('static/user_detail_12.png', format='png')
+    plt.savefig('BankManager/static/user_detail_12.png', format='png')
     plt.close()
     for i in range(len(bank)):
         new_user = []
@@ -547,11 +551,11 @@ def calculate(session):
                 user = 0
                 index = index + 1
         plt.plot(new_index, new_user, label=str(bank[i]))
-    plt.xlabel('年度')
-    plt.ylabel('支票账户总额度')
-    plt.title('逐年度支票账户总额度统计')
+    plt.xlabel('Year')
+    plt.ylabel('Check Account Total')
+    plt.title('Check Account Total Per Year')
     plt.legend(loc='upper left')
-    plt.savefig('static/check_detail_12.png', format='png')
+    plt.savefig('BankManager/static/check_detail_12.png', format='png')
     plt.close()
     for i in range(len(bank)):
         new_user = []
@@ -569,10 +573,10 @@ def calculate(session):
                 user = 0
                 index = index + 1
         plt.plot(new_index, new_user, label=str(bank[i]))
-    plt.xlabel('年度')
-    plt.ylabel('储蓄账户总额度')
-    plt.title('逐年度储蓄账户总额度统计')
+    plt.xlabel('Year')
+    plt.ylabel('Saving Account Total')
+    plt.title('Saving Account Total Per Year')
     plt.legend(loc='upper left')
-    plt.savefig('static/save_detail_12.png', format='png')
+    plt.savefig('BankManager/static/save_detail_12.png', format='png')
     plt.close()
     return bank, date, usercount, checkwealth, savewealth, usercount_detail, checkwealth_detail, savewealth_detail

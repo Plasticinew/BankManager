@@ -93,7 +93,11 @@ def editbank(pk):
         with session_scope() as session:
 
             if bankname:
-                setBank(session, pk, bankname, 'BankName')
+                try:
+                    setBank(session, pk, bankname, 'BankName')
+                except Exception as e:
+                    error = e.args[0]
+                    return flash(error, "修改支行信息", url_for("bank.bank", page=0))
                 pk = bankname
 
             if city:
@@ -114,7 +118,11 @@ def editbank(pk):
 @login_required
 def delbank(pk):
     with session_scope() as session:
-        delBank(session, pk)
+        try:
+            delBank(session, pk)
+        except Exception as e:
+            error = e.args[0]
+            return flash(error, "删除支行信息", url_for("bank.bank", page=0))
     return render_template("del.html", type=2, succ=1)
 
 @bp.route("/success<string:p>", methods=('GET', 'POST'))
